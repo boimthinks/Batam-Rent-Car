@@ -1,0 +1,146 @@
+---
+import { Users, Briefcase, Cog, MessageCircle, Info } from '@lucide/astro';
+import { formatIDR, estimateSGD, estimateMYR } from '../utils/currency';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
+
+interface Props {
+  id: string;
+  slug: string;
+  data: {
+    title: string;
+    carModel: string;
+    category: string;
+    transmission: string;
+    seats: number;
+    luggageCapacity: number;
+    priceDailySelfDrive?: number;
+    priceDailyWithDriver: number;
+    features: string[];
+    popularFor: string;
+    pickupLocations: string[];
+    image: string;
+    featured?: boolean;
+  };
+  lang?: 'id' | 'en';
+}
+
+const { id, slug, data, lang = 'id' } = Astro.props;
+const isEn = lang === 'en';
+
+const waUrl = buildWhatsAppUrl({
+  carModel: data.carModel,
+  lang,
+});
+
+const detailUrl = isEn ? `/en/car/${slug}` : `/mobil/${slug}`;
+const hasSelfDrive = Boolean(data.priceDailySelfDrive);
+---
+
+<div
+  class="vehicle-card bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col group"
+  data-category={data.category.toLowerCase()}
+  data-self-drive={hasSelfDrive ? 'true' : 'false'}
+  data-driver="true"
+>
+  <!-- Vehicle Image (4:3 Aspect Ratio) -->
+  <a href={detailUrl} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block cursor-pointer">
+    <img
+      src={data.image}
+      alt={data.title}
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    />
+    
+    <!-- Category Badge -->
+    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-[11px] font-bold shadow-xs">
+      {data.category}
+    </span>
+
+    {data.featured && (
+      <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-blue-600 text-white text-[11px] font-bold shadow-xs">
+        {isEn ? 'Top Choice' : 'Terlaris'}
+      </span>
+    )}
+  </a>
+
+  <!-- Content -->
+  <div class="p-4 flex-1 flex flex-col justify-between">
+    <div>
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base group-hover:text-blue-600 transition-colors">
+            <a href={detailUrl}>{data.carModel}</a>
+          </h3>
+          <p class="text-xs text-slate-500 line-clamp-1">{data.popularFor}</p>
+        </div>
+      </div>
+
+      <!-- Specs Capsule Pills -->
+      <div class="flex flex-wrap items-center gap-1.5 my-3">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+          <Users class="w-3.5 h-3.5 text-blue-600" />
+          <span>{data.seats} {isEn ? 'Seats' : 'Kursi'}</span>
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+          <Briefcase class="w-3.5 h-3.5 text-blue-600" />
+          <span>{data.luggageCapacity} {isEn ? 'Bags' : 'Koper'}</span>
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+          <Cog class="w-3.5 h-3.5 text-blue-600" />
+          <span>{data.transmission}</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Pricing & Action -->
+    <div class="pt-3 border-t border-slate-100 mt-2">
+      <div class="flex items-baseline justify-between mb-3">
+        <div>
+          <span class="text-[11px] text-slate-500 block font-medium">
+            {hasSelfDrive ? (isEn ? 'Self-Drive from' : 'Lepas Kunci mulai') : (isEn ? 'With Driver from' : 'Dengan Supir mulai')}
+          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-lg font-black text-slate-900">
+              {formatIDR(data.priceDailySelfDrive || data.priceDailyWithDriver)}
+            </span>
+            <span class="text-xs text-slate-500 font-medium">/{isEn ? 'day' : 'hari'}</span>
+          </div>
+        </div>
+
+        <!-- SGD/MYR preview for international appeal -->
+        <div class="text-right">
+          <span class="text-[11px] font-bold text-blue-600 block">
+            {estimateSGD(data.priceDailySelfDrive || data.priceDailyWithDriver)}
+          </span>
+          <span class="text-[10px] text-slate-400">
+            {estimateMYR(data.priceDailySelfDrive || data.priceDailyWithDriver)}
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Quick Peek BottomSheet Trigger -->
+        <button
+          type="button"
+          data-open-sheet={slug}
+          class="btn-open-sheet flex items-center justify-center gap-1 py-2 px-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-colors cursor-pointer"
+        >
+          <Info class="w-3.5 h-3.5 text-slate-500" />
+          <span>{isEn ? 'Specs' : 'Detail'}</span>
+        </button>
+
+        <!-- WhatsApp Green Action -->
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-colors shadow-xs"
+        >
+          <MessageCircle class="w-3.5 h-3.5 fill-current" />
+          <span>{isEn ? 'Book WA' : 'Sewa WA'}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

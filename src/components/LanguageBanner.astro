@@ -1,0 +1,71 @@
+---
+interface Props {
+  currentLang?: 'id' | 'en';
+}
+
+const { currentLang = 'id' } = Astro.props;
+---
+
+<aside
+  id="lang-banner"
+  class="hidden fixed top-16 left-0 right-0 z-40 bg-blue-900 text-white text-xs py-2.5 px-4 shadow-md transition-transform duration-300"
+  aria-label="Language Recommendation"
+>
+  <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <span class="text-base">🇸🇬 🇲🇾</span>
+      <p id="lang-banner-text" class="text-slate-100">
+        Visiting Batam from Singapore or Malaysia? Switch to the English edition for SGD/MYR rates and guide.
+      </p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <a
+        id="lang-banner-cta"
+        href="/en"
+        class="bg-white text-blue-900 hover:bg-blue-50 font-bold px-3 py-1 rounded-lg text-xs transition-colors shadow-xs"
+      >
+        Switch to English
+      </a>
+      <button
+        id="lang-banner-close"
+        type="button"
+        class="text-slate-300 hover:text-white p-1"
+        aria-label="Close language banner"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+</aside>
+
+<script is:inline define:vars={{ currentLang }}>
+  function checkLangBanner() {
+    try {
+      const dismissed = localStorage.getItem('lincah_lang_dismissed');
+      if (dismissed) return;
+
+      const userLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      const banner = document.getElementById('lang-banner');
+      const closeBtn = document.getElementById('lang-banner-close');
+
+      if (!banner) return;
+
+      // If user is on ID page but browser language starts with 'en'
+      if (currentLang === 'id' && userLang.startsWith('en')) {
+        banner.classList.remove('hidden');
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          banner.classList.add('hidden');
+          localStorage.setItem('lincah_lang_dismissed', 'true');
+        });
+      }
+    } catch (e) {
+      // safe fallback
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', checkLangBanner);
+  document.addEventListener('astro:page-load', checkLangBanner);
+</script>

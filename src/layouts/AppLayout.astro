@@ -1,0 +1,218 @@
+---
+import StickyTopBar from '../components/StickyTopBar.astro';
+import BottomNavBar from '../components/BottomNavBar.astro';
+import LanguageBanner from '../components/LanguageBanner.astro';
+import { ClientRouter } from 'astro:transitions';
+import { getAlternateUrl } from '../utils/i18n';
+import { MapPin, Phone, Clock, ShieldCheck, Award } from '@lucide/astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: 'id' | 'en';
+  canonicalUrl?: string;
+  ogImage?: string;
+  schema?: Record<string, any> | Record<string, any>[];
+}
+
+const {
+  title,
+  description = "Sewa mobil murah di Batam lepas kunci & dengan supir. Unit bersih, terawat, antar-jemput gratis di Bandara Hang Nadim & Pelabuhan Batam Centre / Harbour Bay.",
+  lang = 'id',
+  canonicalUrl,
+  ogImage = 'https://lincahrentcar.com/images/blog/pelabuhan-batam.svg',
+  schema,
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+const siteUrl = 'https://lincahrentcar.com';
+const resolvedCanonical = canonicalUrl || `${siteUrl}${currentPath}`;
+
+// Calculate alternate hreflangs using unified i18n helper
+const isEn = lang === 'en';
+const idUrl = `${siteUrl}${getAlternateUrl(currentPath, 'id')}`;
+const enUrl = `${siteUrl}${getAlternateUrl(currentPath, 'en')}`;
+
+const defaultLocalBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "AutoRental",
+  "name": "Lincah Rent Car",
+  "url": siteUrl,
+  "logo": `${siteUrl}/logo.svg`,
+  "image": `${siteUrl}/images/blog/pelabuhan-batam.svg`,
+  "telephone": "+6281373703639",
+  "priceRange": "IDR 250.000 - IDR 2.200.000",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai",
+    "addressLocality": "Batam",
+    "addressRegion": "Kepulauan Riau",
+    "postalCode": "29431",
+    "addressCountry": "ID"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 1.116667,
+    "longitude": 104.050000
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
+  }
+};
+
+const finalSchemas = schema
+  ? Array.isArray(schema)
+    ? [defaultLocalBusinessSchema, ...schema]
+    : [defaultLocalBusinessSchema, schema]
+  : [defaultLocalBusinessSchema];
+---
+
+<!doctype html>
+<html lang={lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title} | Lincah Rent Car Batam</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={resolvedCanonical} />
+
+    <!-- Seamless View Transitions Client Router -->
+    <ClientRouter />
+
+    <!-- Multilingual hreflang alternates -->
+    <link rel="alternate" hreflang="id" href={idUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={resolvedCanonical} />
+    <meta property="og:title" content={`${title} | Lincah Rent Car Batam`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={isEn ? "en_SG" : "id_ID"} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | Lincah Rent Car Batam`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Structured Data JSON-LD -->
+    {finalSchemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+  </head>
+  <body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 pb-20 md:pb-0">
+    <!-- Language Suggestion Banner -->
+    <LanguageBanner currentLang={lang} />
+
+    <!-- Sticky App Header -->
+    <StickyTopBar lang={lang} currentPath={currentPath} />
+
+    <!-- Main Container -->
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 md:py-8">
+      <slot />
+    </main>
+
+    <!-- App Footer -->
+    <footer class="bg-slate-900 text-slate-300 pt-12 pb-24 md:pb-12 border-t border-slate-800 text-sm">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <!-- Col 1: Brand Info -->
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black">
+                L
+              </div>
+              <span class="font-extrabold text-lg text-white">LINCAH<span class="text-blue-500">RENT</span></span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              {isEn
+                ? "Fast, comfortable, and flexible car rental in Batam. Self-drive and chauffeur services with free pickup at ferry terminals and airport."
+                : "Sewa mobil cepat, nyaman, dan fleksibel di Batam. Layanan lepas kunci & dengan supir dengan serah terima gratis di pelabuhan & bandara."}
+            </p>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <Clock class="w-4 h-4 text-emerald-400" />
+              <span>Standby 24 Jam Setiap Hari</span>
+            </div>
+          </div>
+
+          <!-- Col 2: Navigation -->
+          <div>
+            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? "Quick Links" : "Navigasi Cepat"}
+            </h3>
+            <ul class="space-y-2 text-xs text-slate-400">
+              <li><a href={isEn ? "/en/car" : "/mobil"} class="hover:text-white transition-colors">{isEn ? "All Cars" : "Katalog Mobil"}</a></li>
+              <li><a href={isEn ? "/en/layanan/lepas-kunci" : "/layanan/lepas-kunci"} class="hover:text-white transition-colors">{isEn ? "Self-Drive" : "Sewa Lepas Kunci"}</a></li>
+              <li><a href={isEn ? "/en/layanan/dengan-supir" : "/layanan/dengan-supir"} class="hover:text-white transition-colors">{isEn ? "With Driver" : "Sewa Dengan Supir"}</a></li>
+              <li><a href={isEn ? "/en/layanan/sewa-mingguan" : "/layanan/sewa-mingguan"} class="hover:text-white transition-colors">{isEn ? "Weekly Rental" : "Sewa Mobil Mingguan"}</a></li>
+              <li><a href={isEn ? "/en/lokasi" : "/lokasi"} class="hover:text-white transition-colors">{isEn ? "Pickup Hubs" : "Titik Jemput Pelabuhan"}</a></li>
+              <li><a href={isEn ? "/en/guide" : "/blog"} class="hover:text-white transition-colors">{isEn ? "Travel Guide" : "Blog & Tips Batam"}</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 3: Pickup Hubs -->
+          <div>
+            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? "Top Pickup Hubs" : "Titik Jemput Populer"}
+            </h3>
+            <ul class="space-y-2 text-xs text-slate-400">
+              <li><a href={isEn ? "/en/lokasi/batam-centre" : "/lokasi/batam-centre"} class="hover:text-white transition-colors">Batam Centre Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/harbour-bay" : "/lokasi/harbour-bay"} class="hover:text-white transition-colors">Harbour Bay Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/hang-nadim" : "/lokasi/hang-nadim"} class="hover:text-white transition-colors">Bandara Hang Nadim (BTH)</a></li>
+              <li><a href={isEn ? "/en/lokasi/sekupang" : "/lokasi/sekupang"} class="hover:text-white transition-colors">Sekupang Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/mega-legenda" : "/lokasi/mega-legenda"} class="hover:text-white transition-colors">Mega Legenda 2 (Kantor Pusat)</a></li>
+            </ul>
+          </div>
+
+          <!-- Col 4: Contact & Address -->
+          <div>
+            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              {isEn ? "Head Office" : "Kantor & Kontak"}
+            </h3>
+            <div class="space-y-2.5 text-xs text-slate-400">
+              <div class="flex items-start gap-2">
+                <MapPin class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                <span class="leading-relaxed">
+                  Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai - Batam, Kepri 29431
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <Phone class="w-4 h-4 text-emerald-400 shrink-0" />
+                <a href="https://wa.me/6281373703639" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline font-semibold">
+                  0813-7370-3639 (WA CS)
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <p>© 2026 Lincah Rent Car Batam. Hak cipta dilindungi.</p>
+          <div class="flex items-center gap-4">
+            <span class="inline-flex items-center gap-1 text-slate-400">
+              <ShieldCheck class="w-3.5 h-3.5 text-blue-400" /> Unit Bersih & Terawat
+            </span>
+            <span class="inline-flex items-center gap-1 text-slate-400">
+              <Award class="w-3.5 h-3.5 text-amber-400" /> Jaminan Tepat Waktu
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Fixed Bottom App Navigation (Mobile Only) -->
+    <BottomNavBar lang={lang} currentPath={currentPath} />
+  </body>
+</html>

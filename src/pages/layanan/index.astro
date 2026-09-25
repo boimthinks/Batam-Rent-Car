@@ -1,0 +1,80 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import { getCollection } from 'astro:content';
+import { ShieldCheck, CheckCircle2, ArrowRight } from '@lucide/astro';
+
+const services = await getCollection('layanan');
+---
+
+<AppLayout
+  title="Layanan Rental Mobil Batam - Lepas Kunci, Supir & Antar Jemput"
+  description="Pilihan layanan rental mobil di Batam: lepas kunci 24 jam, mobil dengan supir, sewa bulanan perusahaan, dan antar-jemput bandara/pelabuhan ferry."
+>
+  <div class="mb-6">
+    <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">
+      Layanan Lincah Rent Car
+    </span>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+      Solusi Transportasi Fleksibel di Seluruh Batam
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Sesuaikan kebutuhan mobilitas Anda dengan paket rental lepas kunci, pengemudi profesional, antar jemput pelabuhan, hingga sewa kontrak bulanan untuk operasional bisnis.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-6">
+    {services.map((srv) => {
+      const slug = srv.id.replace(/\.md$/, '');
+      const d = srv.data;
+      return (
+        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+          <div>
+            <!-- Gambar Layanan 4:3 -->
+            <a href={`/layanan/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+              <img
+                src={d.image}
+                alt={d.title}
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-xs font-bold shadow-xs">
+                {d.badge || 'Layanan'}
+              </span>
+            </a>
+
+            <div class="p-5">
+              <h2 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                <a href={`/layanan/${slug}`}>
+                  {d.title}
+                </a>
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed">
+                {d.shortDesc}
+              </p>
+
+              <!-- Feature Bullets -->
+              <ul class="space-y-2 mb-2">
+                {d.features.map((f) => (
+                  <li class="flex items-center gap-2 text-xs text-slate-700">
+                    <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            <a
+              href={`/layanan/${slug}`}
+              class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-800 text-xs font-bold transition-all"
+            >
+              <span>Pelajari Syarat & Rincian</span>
+              <ArrowRight class="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</AppLayout>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 50" width="260" height="50">
+  <rect x="0" y="5" width="40" height="40" rx="10" fill="#1447E6"/>
+  <!-- Car icon in logo -->
+  <path d="M8 28 L14 18 L26 18 L32 28 Z" fill="#FFFFFF"/>
+  <circle cx="14" cy="31" r="3" fill="#1447E6"/>
+  <circle cx="26" cy="31" r="3" fill="#1447E6"/>
+  <text x="50" y="28" fill="#1E293B" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800">LINCAH</text>
+  <text x="145" y="28" fill="#1447E6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800">RENT</text>
+  <text x="50" y="42" fill="#64748B" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CAR BATAM</text>
+</svg>

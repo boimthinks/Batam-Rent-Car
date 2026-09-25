@@ -1,0 +1,103 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { getCollection } from 'astro:content';
+import { ShieldCheck, CheckCircle2, ArrowRight } from '@lucide/astro';
+
+const services = await getCollection('layanan');
+
+const enServiceTitles: Record<string, { title: string; desc: string }> = {
+  'lepas-kunci': {
+    title: 'Self-Drive Car Rental in Batam - 24 Hours Flexibility',
+    desc: 'Rent a car without a driver for ultimate privacy during your holiday or business trip in Batam. Easy online verification via WhatsApp with Singapore/Malaysia driving licence.'
+  },
+  'dengan-supir': {
+    title: 'Car Rental with Chauffeur in Batam - Relax & Safe',
+    desc: 'Enjoy touring Batam without driving fatigue. Accompanied by professional, courteous local drivers who know the best shortcut routes, seafood kelongs, and tourist spots.'
+  },
+  'sewa-bulanan': {
+    title: 'Monthly & Corporate Fleet Rental Batam',
+    desc: 'Cost-effective long-term car rental solutions for expatriates, multinational companies, and shipyard/offshore project contractors in Batam.'
+  },
+  'sewa-mingguan': {
+    title: 'Weekly Car Rental in Batam - 7-Day Discount Package',
+    desc: 'Cost-saving 7-day car rental package for extended holidays, family visits, or business projects in Batam. Self-drive or with professional chauffeur.'
+  },
+  'antar-jemput-bandara-pelabuhan': {
+    title: 'Airport & Ferry Terminal Transfer Service',
+    desc: 'Punctual drop-off and pickup transfers from Hang Nadim Airport and Ferry Terminals at Harbour Bay, Batam Centre, Sekupang, and Nongsapura.'
+  }
+};
+---
+
+<AppLayout
+  title="Batam Car Rental Services - Self-Drive, Chauffeur & Ferry Transfers"
+  description="Explore our flexible transportation options in Batam: 24-hour self-drive, private chauffeur services, corporate monthly rental, and airport/ferry transfers."
+  lang="en"
+>
+  <div class="mb-6">
+    <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">
+      Lincah Rent Car Services
+    </span>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+      Flexible Island Transportation Services
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Choose the most convenient rental package for your trip: self-drive flexibility, experienced private chauffeurs, or direct ferry terminal transfers.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-6">
+    {services.map((srv) => {
+      const slug = srv.id.replace(/\.md$/, '');
+      const d = srv.data;
+      const trans = enServiceTitles[slug] || { title: d.title, desc: d.shortDesc };
+      return (
+        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+          <div>
+            <a href={`/en/layanan/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+              <img
+                src={d.image}
+                alt={trans.title}
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-xs font-bold shadow-xs">
+                {d.badge || 'Service'}
+              </span>
+            </a>
+
+            <div class="p-5">
+              <h2 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                <a href={`/en/layanan/${slug}`}>
+                  {trans.title}
+                </a>
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed">
+                {trans.desc}
+              </p>
+
+              <ul class="space-y-2 mb-2">
+                {d.features.map((f) => (
+                  <li class="flex items-center gap-2 text-xs text-slate-700">
+                    <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            <a
+              href={`/en/layanan/${slug}`}
+              class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-800 text-xs font-bold transition-all"
+            >
+              <span>View Service Details</span>
+              <ArrowRight class="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</AppLayout>

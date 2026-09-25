@@ -1,0 +1,71 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import { getCollection } from 'astro:content';
+import { BookOpen, Calendar, ArrowRight } from '@lucide/astro';
+
+const allPosts = await getCollection('blog', ({ data }) => data.lang === 'id');
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+<AppLayout
+  title="Blog & Panduan Rental Mobil Batam"
+  description="Artikel edukasi seputar rute wisata Jembatan Barelang, panduan pelabuhan Batam Centre vs Harbour Bay, tips sewa lepas kunci, dan kuliner Batam."
+>
+  <div class="mb-6">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
+      <BookOpen class="w-3.5 h-3.5" />
+      <span>Edukasi & Panduan Wisata Batam</span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+      Blog & Informasi Terkini
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Kumpulan artikel panduan perjalanan, perbandingan titik jemput pelabuhan, estimasi biaya sewa mobil, dan syarat lepas kunci di Batam.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 my-6">
+    {sortedPosts.map((post) => {
+      const slug = post.id.replace(/\.md$/, '');
+      const d = post.data;
+      return (
+        <article class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all">
+          <div>
+            <a href={`/blog/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
+              <img
+                src={d.featuredImage}
+                alt={d.title}
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </a>
+            <div class="p-5">
+              <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 mb-2">
+                <Calendar class="w-3.5 h-3.5" />
+                <span>{d.pubDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+
+              <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
+                <a href={`/blog/${slug}`}>{d.title}</a>
+              </h2>
+
+              <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed">
+                {d.summary}
+              </p>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            <a
+              href={`/blog/${slug}`}
+              class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700"
+            >
+              <span>Baca Selengkapnya</span>
+              <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+</AppLayout>

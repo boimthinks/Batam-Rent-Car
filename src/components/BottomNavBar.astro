@@ -1,0 +1,90 @@
+---
+import { Home, Car, MapPin, MessageCircle } from '@lucide/astro';
+
+interface Props {
+  lang?: 'id' | 'en';
+  currentPath?: string;
+}
+
+const { lang = 'id', currentPath = '/' } = Astro.props;
+
+const isEn = lang === 'en';
+
+const homeUrl = isEn ? '/en' : '/';
+const carUrl = isEn ? '/en/car' : '/mobil';
+const hubUrl = isEn ? '/en/lokasi' : '/lokasi';
+const waText = isEn
+  ? 'Hi Lincah Rent Car, I would like to check available cars in Batam.'
+  : 'Halo Admin Lincah Rent Car, saya ingin tanya ketersediaan sewa mobil di Batam.';
+const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
+
+const isHome = currentPath === '/' || currentPath === '/en';
+const isCar = currentPath.startsWith('/mobil') || currentPath.startsWith('/en/car');
+const isHub = currentPath.startsWith('/lokasi') || currentPath.startsWith('/en/lokasi');
+---
+
+<nav
+  aria-label="Mobile Navigation"
+  class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
+>
+  <div class="grid grid-cols-4 h-16 max-w-md mx-auto items-center px-1">
+    <!-- 1. Beranda -->
+    <a
+      href={homeUrl}
+      class:list={[
+        "flex flex-col items-center justify-center py-1 transition-colors relative",
+        isHome ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-900 font-medium"
+      ]}
+    >
+      <Home class="w-5 h-5 mb-1" />
+      <span class="text-[11px] leading-tight">{isEn ? 'Home' : 'Beranda'}</span>
+      {isHome && <span class="absolute top-1 w-1.5 h-1.5 bg-blue-600 rounded-full"></span>}
+    </a>
+
+    <!-- 2. Mobil -->
+    <a
+      href={carUrl}
+      class:list={[
+        "flex flex-col items-center justify-center py-1 transition-colors relative",
+        isCar ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-900 font-medium"
+      ]}
+    >
+      <Car class="w-5 h-5 mb-1" />
+      <span class="text-[11px] leading-tight">{isEn ? 'Cars' : 'Mobil'}</span>
+      {isCar && <span class="absolute top-1 w-1.5 h-1.5 bg-blue-600 rounded-full"></span>}
+    </a>
+
+    <!-- 3. Titik Jemput -->
+    <a
+      href={hubUrl}
+      class:list={[
+        "flex flex-col items-center justify-center py-1 transition-colors relative",
+        isHub ? "text-blue-600 font-bold" : "text-slate-500 hover:text-slate-900 font-medium"
+      ]}
+    >
+      <MapPin class="w-5 h-5 mb-1" />
+      <span class="text-[11px] leading-tight">{isEn ? 'Pickups' : 'Titik Jemput'}</span>
+      {isHub && <span class="absolute top-1 w-1.5 h-1.5 bg-blue-600 rounded-full"></span>}
+    </a>
+
+    <!-- 4. Chat WA dengan Badge Online -->
+    <a
+      href={waUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex flex-col items-center justify-center py-1 text-emerald-600 hover:text-emerald-700 font-bold relative group"
+    >
+      <div class="relative">
+        <div class="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-xs group-hover:scale-110 transition-transform">
+          <MessageCircle class="w-4 h-4 fill-current" />
+        </div>
+        <!-- Pulse online status indicator -->
+        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-white"></span>
+        </span>
+      </div>
+      <span class="text-[11px] text-emerald-700 leading-tight mt-0.5">Chat WA</span>
+    </a>
+  </div>
+</nav>

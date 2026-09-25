@@ -1,0 +1,40 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import { Home, MessageCircle } from '@lucide/astro';
+---
+
+<AppLayout
+  title="Halaman Tidak Ditemukan (404)"
+  description="Halaman yang Anda cari tidak dapat ditemukan. Kembali ke beranda Lincah Rent Car Batam."
+>
+  <div class="py-16 text-center max-w-md mx-auto">
+    <div class="w-16 h-16 rounded-3xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+      404
+    </div>
+    <h1 class="text-xl sm:text-2xl font-black text-slate-900 mb-2">
+      Halaman Tidak Ditemukan
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+      Halaman yang Anda tuju mungkin sudah dipindahkan atau alamat URL kurang tepat.
+    </p>
+
+    <div class="flex items-center justify-center gap-3">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+      >
+        <Home class="w-4 h-4" />
+        <span>Ke Beranda</span>
+      </a>
+      <a
+        href="https://wa.me/6281373703639?text=Halo%20Admin%20Lincah%20Rent%20Car"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors shadow-xs"
+      >
+        <MessageCircle class="w-4 h-4 fill-current" />
+        <span>Hubungi CS</span>
+      </a>
+    </div>
+  </div>
+</AppLayout>

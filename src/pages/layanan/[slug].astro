@@ -1,0 +1,142 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import VehicleCard from '../../components/VehicleCard.astro';
+import BottomSheetModal from '../../components/BottomSheetModal.astro';
+import { getCollection, render } from 'astro:content';
+import { CheckCircle2, MessageCircle, ArrowLeft, ShieldCheck, Flame, ArrowRight } from '@lucide/astro';
+
+export async function getStaticPaths() {
+  const services = await getCollection('layanan');
+  return services.map((srv) => ({
+    params: { slug: srv.id.replace(/\.md$/, '') },
+    props: { srv },
+  }));
+}
+
+const { srv } = Astro.props;
+const { Content } = await render(srv);
+const d = srv.data;
+
+// Ambil hanya mobil terlaris (featured: true)
+const allCars = await getCollection('mobil');
+const popularCars = allCars.filter((car) => car.data.featured);
+
+const sheetCars = popularCars.map((c) => ({
+  id: c.id,
+  slug: c.id.replace(/\.md$/, ''),
+  data: c.data,
+}));
+
+const waText = `Halo Admin Lincah Rent Car, saya ingin konsultasi mengenai ${d.title} di Batam.`;
+const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
+---
+
+<AppLayout
+  title={d.title}
+  description={d.shortDesc}
+>
+  <div class="mb-4">
+    <a href="/layanan" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+      <ArrowLeft class="w-4 h-4" />
+      <span>Kembali ke Daftar Layanan</span>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Gambar Layanan 4:3 -->
+      <div class="relative aspect-[4/3] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-sm">
+        <img
+          src={d.image}
+          alt={d.title}
+          class="w-full h-full object-cover"
+        />
+        <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold shadow-xs">
+          {d.badge || 'Layanan Utama'}
+        </span>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3 tracking-tight">
+          {d.title}
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+          {d.shortDesc}
+        </p>
+
+        <div class="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Feature highlight -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs">
+        <h2 class="text-base font-black text-slate-900 mb-3">Keuntungan Layanan Ini</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {d.features.map((f) => (
+            <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
+              <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>{f}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Rekomendasi Mobil Terlaris untuk Layanan Ini -->
+      <div class="space-y-4 pt-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold mb-1">
+              <Flame class="w-3.5 h-3.5 text-amber-600" />
+              <span>Mobil Terlaris & Paling Diminati</span>
+            </span>
+            <h2 class="text-lg font-black text-slate-900">Unit Rekomendasi</h2>
+          </div>
+          <a href="/mobil" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+            <span>Lihat Semua Mobil</span>
+            <ArrowRight class="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {popularCars.map((car) => (
+            <VehicleCard
+              id={car.id}
+              slug={car.id.replace(/\.md$/, '')}
+              data={car.data}
+              lang="id"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar CTA -->
+    <div class="lg:col-span-1 space-y-4">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm sticky top-20">
+        <h3 class="text-base font-black text-slate-900 mb-2">Konsultasi Layanan</h3>
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+          Hubungi admin kami untuk penyesuaian jadwal sewa, diskon durasi panjang, atau armada khusus.
+        </p>
+
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95"
+        >
+          <MessageCircle class="w-4 h-4 fill-current" />
+          <span>Chat WhatsApp Sekarang</span>
+        </a>
+
+        <div class="mt-4 pt-4 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-500">
+          <ShieldCheck class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+          <span>Pelayanan cepat, respon ramah 24 jam setiap hari.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Modal untuk Quick Peek Specs -->
+  <BottomSheetModal cars={sheetCars} lang="id" />
+</AppLayout>

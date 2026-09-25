@@ -1,0 +1,71 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { getCollection } from 'astro:content';
+import { BookOpen, Calendar, ArrowRight } from '@lucide/astro';
+
+const enPosts = await getCollection('blog', ({ data }) => data.lang === 'en');
+---
+
+<AppLayout
+  title="Batam Travel & Car Rental Guides (Singapore & Malaysia Edition)"
+  description="Practical advice for Singaporeans and Malaysians traveling to Batam: self-drive licence requirements, ferry terminal pickups, and driving advice."
+  lang="en"
+>
+  <div class="mb-6">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
+      <BookOpen class="w-3.5 h-3.5" />
+      <span>Traveller Information</span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+      Batam Travel & Driving Guides
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Curated guides to help you navigate Batam with ease, understand local traffic rules, and make the most of your island weekend getaway.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-6">
+    {enPosts.map((post) => {
+      const slug = post.id.replace(/\.md$/, '');
+      const d = post.data;
+      return (
+        <article class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all">
+          <div>
+            <a href={`/en/guide/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
+              <img
+                src={d.featuredImage}
+                alt={d.title}
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </a>
+            <div class="p-5">
+              <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 mb-2">
+                <Calendar class="w-3.5 h-3.5" />
+                <span>{d.pubDate.toLocaleDateString('en-SG', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+
+              <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
+                <a href={`/en/guide/${slug}`}>{d.title}</a>
+              </h2>
+
+              <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed">
+                {d.summary}
+              </p>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            <a
+              href={`/en/guide/${slug}`}
+              class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700"
+            >
+              <span>Read Full Guide</span>
+              <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+</AppLayout>

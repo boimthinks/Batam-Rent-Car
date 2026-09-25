@@ -1,0 +1,276 @@
+---
+import { X, CheckCircle, ShieldCheck, Users, Briefcase, Cog, MessageCircle, ArrowRight } from '@lucide/astro';
+import { formatIDR, estimateSGD, estimateMYR } from '../utils/currency';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
+
+interface CarItem {
+  id: string;
+  slug: string;
+  data: {
+    title: string;
+    carModel: string;
+    category: string;
+    transmission: string;
+    seats: number;
+    luggageCapacity: number;
+    priceDailySelfDrive?: number;
+    priceDailyWithDriver: number;
+    features: string[];
+    popularFor: string;
+    pickupLocations: string[];
+    image: string;
+  };
+}
+
+interface Props {
+  cars: CarItem[];
+  lang?: 'id' | 'en';
+}
+
+const { cars, lang = 'id' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<!-- Sheet Container (Hidden by default) -->
+<div
+  id="sheet-backdrop"
+  class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none flex items-end justify-center"
+  aria-hidden="true"
+>
+  <div
+    id="sheet-panel"
+    class="w-full max-w-xl bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col transform translate-y-full transition-transform duration-300 ease-out pb-safe"
+    role="dialog"
+    aria-modal="true"
+  >
+    <!-- Handle bar for swipe hint -->
+    <div class="pt-3 pb-1 flex justify-center cursor-grab">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+    </div>
+
+    <!-- Header with Close Button -->
+    <div class="px-5 pb-3 pt-1 flex items-center justify-between border-b border-slate-100">
+      <div>
+        <span id="sheet-category" class="text-[11px] font-bold uppercase tracking-wider text-blue-600">Category</span>
+        <h3 id="sheet-title" class="text-lg font-black text-slate-900">Car Model</h3>
+      </div>
+      <button
+        id="sheet-close-btn"
+        type="button"
+        class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+        aria-label="Close sheet"
+      >
+        <X class="w-4 h-4" />
+      </button>
+    </div>
+
+    <!-- Scrollable Body Content -->
+    <div class="overflow-y-auto px-5 py-4 space-y-4">
+      <!-- Image & Quick Specs (4:3) -->
+      <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+        <img id="sheet-image" src="" alt="" class="w-full h-full object-cover" />
+      </div>
+
+      <!-- Specs Pills -->
+      <div class="grid grid-cols-3 gap-2 py-2">
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center">
+          <Users class="w-4 h-4 text-blue-600 mx-auto mb-1" />
+          <span class="text-[10px] text-slate-400 block font-medium">{isEn ? 'Capacity' : 'Kapasitas'}</span>
+          <span id="sheet-seats" class="text-xs font-bold text-slate-800">7 Kursi</span>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center">
+          <Briefcase class="w-4 h-4 text-blue-600 mx-auto mb-1" />
+          <span class="text-[10px] text-slate-400 block font-medium">{isEn ? 'Luggage' : 'Bagasi'}</span>
+          <span id="sheet-luggage" class="text-xs font-bold text-slate-800">2 Koper</span>
+        </div>
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center">
+          <Cog class="w-4 h-4 text-blue-600 mx-auto mb-1" />
+          <span class="text-[10px] text-slate-400 block font-medium">{isEn ? 'Transmission' : 'Transmisi'}</span>
+          <span id="sheet-trans" class="text-xs font-bold text-slate-800">Matic / Manual</span>
+        </div>
+      </div>
+
+      <!-- Rate Comparison Box -->
+      <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-4">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-blue-900 mb-2.5">
+          {isEn ? 'Rental Rate Options' : 'Pilihan Tarif Sewa Harian'}
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div id="sheet-box-selfdrive" class="bg-white p-3 rounded-xl border border-blue-200/80 shadow-xs">
+            <span class="text-[11px] font-semibold text-slate-500 block">{isEn ? 'Self-Drive (24 Hours)' : 'Lepas Kunci (24 Jam)'}</span>
+            <span id="sheet-price-self" class="text-base font-black text-blue-700">Rp 300.000</span>
+            <span id="sheet-sgd-self" class="text-[11px] text-slate-500 font-medium block">~SGD 27</span>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-blue-200/80 shadow-xs">
+            <span class="text-[11px] font-semibold text-slate-500 block">{isEn ? 'With Driver' : 'Dengan Supir'}</span>
+            <span id="sheet-price-driver" class="text-base font-black text-slate-900">Rp 500.000</span>
+            <span id="sheet-sgd-driver" class="text-[11px] text-slate-500 font-medium block">~SGD 45</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Features -->
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+          {isEn ? 'Key Features & Amenities' : 'Fasilitas & Keunggulan Unit'}
+        </h4>
+        <ul id="sheet-features" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+
+      <!-- Quick Self-Drive Requirements -->
+      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+        <ShieldCheck class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div>
+          <strong class="font-bold">{isEn ? 'Quick Verification' : 'Syarat Mudah Lepas Kunci'}:</strong>
+          <p class="text-[11px] text-amber-800 mt-0.5">
+            {isEn
+              ? 'Passport / ID, driving licence, and return ticket. Free handover at Harbour Bay, Batam Centre & Airport.'
+              : 'Foto KTP, SIM A, dan tiket kepulangan. Serah terima unit gratis di pelabuhan Batam Centre, Harbour Bay & Hang Nadim.'}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sheet Action Footer -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50/80 flex items-center gap-3">
+      <a
+        id="sheet-link-detail"
+        href="#"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-white transition-colors"
+      >
+        {isEn ? 'Full Vehicle Page' : 'Lihat Halaman Lengkap'}
+      </a>
+      <a
+        id="sheet-wa-btn"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition-colors"
+      >
+        <MessageCircle class="w-4 h-4 fill-current" />
+        <span>{isEn ? 'Book via WA' : 'Pesan via WA'}</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Raw data injection for client script -->
+<script is:inline define:vars={{ cars, isEn }}>
+  (function () {
+    const carsMap = {};
+    cars.forEach((c) => {
+      carsMap[c.slug] = c;
+    });
+
+    const backdrop = document.getElementById('sheet-backdrop');
+    const panel = document.getElementById('sheet-panel');
+    const closeBtn = document.getElementById('sheet-close-btn');
+
+    const titleEl = document.getElementById('sheet-title');
+    const catEl = document.getElementById('sheet-category');
+    const imgEl = document.getElementById('sheet-image');
+    const seatsEl = document.getElementById('sheet-seats');
+    const luggageEl = document.getElementById('sheet-luggage');
+    const transEl = document.getElementById('sheet-trans');
+    const priceSelfEl = document.getElementById('sheet-price-self');
+    const sgdSelfEl = document.getElementById('sheet-sgd-self');
+    const boxSelfEl = document.getElementById('sheet-box-selfdrive');
+    const priceDriverEl = document.getElementById('sheet-price-driver');
+    const sgdDriverEl = document.getElementById('sheet-sgd-driver');
+    const featuresListEl = document.getElementById('sheet-features');
+    const detailLinkEl = document.getElementById('sheet-link-detail');
+    const waBtnEl = document.getElementById('sheet-wa-btn');
+
+    function openSheet(slug) {
+      const car = carsMap[slug];
+      if (!car) return;
+
+      const d = car.data;
+      titleEl.textContent = d.carModel;
+      catEl.textContent = d.category;
+      imgEl.src = d.image;
+      imgEl.alt = d.carModel;
+      seatsEl.textContent = `${d.seats} ${isEn ? 'Seats' : 'Kursi'}`;
+      luggageEl.textContent = `${d.luggageCapacity} ${isEn ? 'Bags' : 'Koper'}`;
+      transEl.textContent = d.transmission;
+
+      // Self drive check
+      if (d.priceDailySelfDrive) {
+        boxSelfEl.classList.remove('hidden');
+        priceSelfEl.textContent = `Rp ${d.priceDailySelfDrive.toLocaleString('id-ID')}`;
+        const sgdVal = Math.round(d.priceDailySelfDrive / 11300);
+        sgdSelfEl.textContent = `~SGD ${sgdVal} / ~MYR ${Math.round(d.priceDailySelfDrive / 3550)}`;
+      } else {
+        boxSelfEl.classList.add('hidden');
+      }
+
+      priceDriverEl.textContent = `Rp ${d.priceDailyWithDriver.toLocaleString('id-ID')}`;
+      const sgdDriverVal = Math.round(d.priceDailyWithDriver / 11300);
+      sgdDriverEl.textContent = `~SGD ${sgdDriverVal} / ~MYR ${Math.round(d.priceDailyWithDriver / 3550)}`;
+
+      // Features
+      featuresListEl.innerHTML = '';
+      (d.features || []).forEach((f) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center gap-1.5';
+        li.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span><span>${f}</span>`;
+        featuresListEl.appendChild(li);
+      });
+
+      // Links
+      detailLinkEl.href = isEn ? `/en/car/${slug}` : `/mobil/${slug}`;
+      const msg = isEn
+        ? `Hi Lincah Rent Car, I would like to book ${d.carModel}. Could you check availability?`
+        : `Halo Admin Lincah Rent Car, saya tertarik sewa mobil ${d.carModel} di Batam. Apakah unit tersedia?`;
+      waBtnEl.href = `https://wa.me/6281373703639?text=${encodeURIComponent(msg)}`;
+
+      // Show sheet
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100');
+      panel.classList.remove('translate-y-full');
+      panel.classList.add('translate-y-0');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSheet() {
+      panel.classList.remove('translate-y-0');
+      panel.classList.add('translate-y-full');
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      setTimeout(() => {
+        backdrop.classList.add('pointer-events-none');
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    function bindTriggers() {
+      document.querySelectorAll('.btn-open-sheet').forEach((btn) => {
+        // Remove existing listener clone to avoid duplication
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode?.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const slug = newBtn.getAttribute('data-open-sheet');
+          if (slug) openSheet(slug);
+        });
+      });
+    }
+
+    bindTriggers();
+    document.addEventListener('astro:page-load', bindTriggers);
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSheet);
+    if (backdrop) {
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) closeSheet();
+      });
+    }
+
+    // Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSheet();
+    });
+  })();
+</script>

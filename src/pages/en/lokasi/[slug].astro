@@ -1,0 +1,119 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { getCollection, render } from 'astro:content';
+import { buildWhatsAppUrl } from '../../../utils/whatsapp';
+import { MapPin, Clock, ShieldCheck, CheckCircle2, MessageCircle, ArrowLeft } from '@lucide/astro';
+
+export async function getStaticPaths() {
+  const locations = await getCollection('lokasi');
+  return locations.map((loc) => ({
+    params: { slug: loc.id.replace(/\.md$/, '') },
+    props: { loc },
+  }));
+}
+
+const { loc } = Astro.props;
+const { Content } = await render(loc);
+const d = loc.data;
+
+const waUrl = buildWhatsAppUrl({
+  pickupLocation: d.areaName,
+  lang: 'en',
+});
+---
+
+<AppLayout
+  title={`Car Rental Pickup at ${d.areaName} Batam - Ferry & Airport Handover`}
+  description={`Book car rental with direct delivery to ${d.areaName} Batam. Estimated handover ${d.pickupTimeEstimate}. Free terminal delivery at Harbour Bay, Batam Centre & Airport.`}
+  lang="en"
+>
+  <div class="mb-4">
+    <a href="/en/lokasi" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+      <ArrowLeft class="w-4 h-4" />
+      <span>Back to All Pickup Hubs</span>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <!-- 4:3 Location Image -->
+      <div class="relative aspect-[4/3] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/90 shadow-sm">
+        <img
+          src={d.image}
+          alt={d.title}
+          class="w-full h-full object-cover"
+        />
+        <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold shadow-xs">
+          {d.hubType}
+        </span>
+        <span class="absolute top-4 right-4 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold shadow-xs flex items-center gap-1">
+          <Clock class="w-3.5 h-3.5" />
+          <span>Handover Time: {d.pickupTimeEstimate}</span>
+        </span>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3 tracking-tight">
+          Car Rental Handover at {d.areaName}
+        </h1>
+
+        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+          {d.description || `Seamless car delivery directly to ${d.areaName}, Batam. Free service for ferry passengers and flight arrivals.`}
+        </p>
+
+        <div class="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Landmark Area -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs">
+        <h2 class="text-base font-black text-slate-900 mb-3">Key Landmarks & Meeting Spots</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {d.landmarkKey.map((lm) => (
+            <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
+              <CheckCircle2 class="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{lm}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar CTA -->
+    <div class="lg:col-span-1 space-y-4">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm sticky top-20">
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">
+          Scheduled Arrival Handover
+        </span>
+        <h3 class="text-lg font-black text-slate-900 mb-2">
+          Pickup at {d.areaName}
+        </h3>
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+          Send your ferry departure schedule or flight number to our WhatsApp admin. Our crew will standby before your arrival.
+        </p>
+
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95"
+        >
+          <MessageCircle class="w-4 h-4 fill-current" />
+          <span>Confirm Pickup on WhatsApp</span>
+        </a>
+
+        <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-500">
+          <div class="flex items-start gap-2">
+            <ShieldCheck class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span>Zero delivery fee for major ferry terminals & airport.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <Clock class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+            <span>Driver/staff standby 15 mins before your arrival.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AppLayout>

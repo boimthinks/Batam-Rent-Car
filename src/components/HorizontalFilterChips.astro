@@ -1,0 +1,102 @@
+---
+interface Props {
+  lang?: 'id' | 'en';
+}
+
+const { lang = 'id' } = Astro.props;
+
+const isEn = lang === 'en';
+
+const categories = isEn
+  ? [
+      { id: 'all', label: 'All Cars' },
+      { id: 'mpv', label: 'MPV Family' },
+      { id: 'suv', label: 'SUV & 4x4' },
+      { id: 'van', label: 'Van & Hiace' },
+      { id: 'luxury', label: 'VIP Luxury' },
+      { id: 'self-drive', label: 'Self-Drive' },
+      { id: 'with-driver', label: 'With Driver' },
+    ]
+    : [
+      { id: 'all', label: 'Semua Mobil' },
+      { id: 'mpv', label: 'MPV Keluarga' },
+      { id: 'suv', label: 'SUV & 4x4' },
+      { id: 'van', label: 'Hiace / Minibus' },
+      { id: 'luxury', label: 'VIP Mewah' },
+      { id: 'self-drive', label: 'Lepas Kunci' },
+      { id: 'with-driver', label: 'Dengan Supir' },
+    ];
+---
+
+<div class="w-full my-4">
+  <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 -mx-1 snap-x">
+    {categories.map((cat, index) => (
+      <button
+        type="button"
+        data-filter={cat.id}
+        class:list={[
+          "filter-chip snap-start px-4 py-2 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer border",
+          index === 0
+            ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+        ]}
+      >
+        {cat.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script is:inline>
+  function initFilterChips() {
+    const chips = document.querySelectorAll('.filter-chip');
+    const cards = document.querySelectorAll('.vehicle-card');
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filter = chip.getAttribute('data-filter');
+
+        // Toggle active chip style
+        chips.forEach((c) => {
+          c.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+          c.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+        });
+        chip.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+        chip.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+
+        // Filter cards
+        cards.forEach((card) => {
+          const cat = (card.getAttribute('data-category') || '').toLowerCase();
+          const hasSelf = card.getAttribute('data-self-drive') === 'true';
+          const hasDriver = card.getAttribute('data-driver') === 'true';
+
+          let show = false;
+          if (filter === 'all') {
+            show = true;
+          } else if (filter === 'mpv' && cat === 'mpv') {
+            show = true;
+          } else if (filter === 'suv' && cat === 'suv') {
+            show = true;
+          } else if (filter === 'van' && cat === 'van') {
+            show = true;
+          } else if (filter === 'luxury' && cat === 'luxury') {
+            show = true;
+          } else if (filter === 'self-drive' && hasSelf) {
+            show = true;
+          } else if (filter === 'with-driver' && hasDriver) {
+            show = true;
+          }
+
+          if (show) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initFilterChips);
+  document.addEventListener('astro:page-load', initFilterChips);
+</script>

@@ -1,0 +1,80 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import VehicleCard from '../../components/VehicleCard.astro';
+import HorizontalFilterChips from '../../components/HorizontalFilterChips.astro';
+import BottomSheetModal from '../../components/BottomSheetModal.astro';
+import { getCollection } from 'astro:content';
+import { Car, ShieldCheck } from '@lucide/astro';
+
+const cars = await getCollection('mobil');
+const sortedCars = [...cars].sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return 0;
+});
+
+const sheetCars = sortedCars.map((c) => ({
+  id: c.id,
+  slug: c.id.replace(/\.md$/, ''),
+  data: c.data,
+}));
+---
+
+<AppLayout
+  title="Katalog Lengkap Sewa Mobil Batam"
+  description="Daftar harga dan pilihan unit rental mobil di Batam: Avanza, Innova Reborn, Hiace, Alphard, Pick-up. Lepas kunci 24 jam atau supir profesional."
+>
+  <div class="mb-6">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
+      <Car class="w-3.5 h-3.5" />
+      <span>Katalog Mobil Lincah Rent Car</span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+      Pilihan Mobil Rental di Batam
+    </h1>
+    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Seluruh mobil terawat bersih, berkondisi prima, wangi, dan ber-AC dingin. Serah terima unit gratis langsung di Harbour Bay, Batam Centre Ferry Terminal, dan Bandara Hang Nadim.
+    </p>
+  </div>
+
+  <HorizontalFilterChips lang="id" />
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 my-6">
+    {sortedCars.map((car) => (
+      <VehicleCard
+        id={car.id}
+        slug={car.id.replace(/\.md$/, '')}
+        data={car.data}
+        lang="id"
+      />
+    ))}
+  </div>
+
+  <!-- Syarat & Jaminan Singkat -->
+  <div class="my-10 bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs">
+    <div class="flex items-center gap-2 mb-3">
+      <ShieldCheck class="w-5 h-5 text-emerald-600" />
+      <h2 class="text-base font-extrabold text-slate-900">Jaminan Kualitas Unit Mobil Kami</h2>
+    </div>
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
+      <li class="flex items-start gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+        <span><strong>Asuransi Kendaraan:</strong> Unit terproteksi untuk rasa aman dan ketenangan perjalanan Anda.</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+        <span><strong>Perawatan Rutin:</strong> Servis berkala mesin dan kaki-kaki di bengkel resmi terpercaya.</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+        <span><strong>Gratis Antar Unit:</strong> Serah terima mobil di lobi terminal ferry atau bandara tepat waktu.</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+        <span><strong>Unit Pengganti Cepat:</strong> Jaminan unit cadangan jika terjadi kendala teknis darurat.</span>
+      </li>
+    </ul>
+  </div>
+
+  <BottomSheetModal cars={sheetCars} lang="id" />
+</AppLayout>

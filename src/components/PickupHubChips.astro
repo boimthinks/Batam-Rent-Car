@@ -4,47 +4,60 @@ import { getCollection } from 'astro:content';
 
 interface Props {
   lang?: 'id' | 'en';
+  city?: 'Batam' | 'Palembang';
 }
 
-const { lang = 'id' } = Astro.props;
+const { lang = 'id', city } = Astro.props;
 const isEn = lang === 'en';
 
-const selectedSlugs = [
-  'batam-centre',
-  'harbour-bay',
-  'hang-nadim',
-  'sekupang',
-  'mega-legenda',
-];
-
 const allLocations = await getCollection('lokasi');
-const locationMap = new Map(
-  allLocations.map((loc) => [loc.id.replace(/\.md$/, ''), loc])
-);
 
-const hubs = selectedSlugs
-  .map((slug) => {
-    const loc = locationMap.get(slug);
-    if (!loc) return null;
-    return {
-      slug,
-      name: loc.data.areaName,
-      type: loc.data.hubType,
-      badge: loc.data.pickupTimeEstimate,
-      image: loc.data.image,
-    };
-  })
-  .filter(Boolean);
+const batamLocations = allLocations.filter((loc) => (loc.data.city || 'Batam').toLowerCase() === 'batam');
+const palembangLocations = allLocations.filter((loc) => (loc.data.city || 'Batam').toLowerCase() === 'palembang');
+
+const batamSlugsOrder = ['batam-centre', 'harbour-bay', 'hang-nadim', 'sekupang', 'mega-legenda'];
+const batamHubs = batamSlugsOrder
+  .map((slug) => batamLocations.find((l) => l.id.replace(/\.md$/, '') === slug))
+  .filter(Boolean)
+  .map((loc) => ({
+    slug: loc!.id.replace(/\.md$/, ''),
+    name: loc!.data.areaName,
+    type: loc!.data.hubType,
+    badge: loc!.data.pickupTimeEstimate,
+    image: loc!.data.image,
+  }));
+
+const palembangHubs = palembangLocations.map((loc) => ({
+  slug: loc.id.replace(/\.md$/, ''),
+  name: loc.data.areaName,
+  type: loc.data.hubType,
+  badge: loc.data.pickupTimeEstimate,
+  image: loc.data.image,
+}));
+
+// If city is strictly specified
+const showOnlyBatam = city === 'Batam';
+const showOnlyPalembang = city === 'Palembang';
+const isDynamicDualCity = !city;
 ---
 
-<div class="my-6">
+<!-- Batam Pickup Hub Section -->
+<div
+  class:list={[
+    "my-6 transition-opacity duration-200",
+    showOnlyPalembang && "hidden"
+  ]}
+  data-city-hub="batam"
+>
   <div class="flex items-center justify-between mb-3">
     <div>
       <h2 class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
         <MapPin class="w-4 h-4 text-blue-600" />
         <span>{isEn ? 'Pickup Points in Batam' : 'Titik Jemput Batam'}</span>
       </h2>
-      <p class="text-[11px] text-slate-500">{isEn ? 'Select your arrival point for fast handover' : 'Mobil diantar langsung ke lobi kedatangan Anda'}</p>
+      <p class="text-[11px] text-slate-500">
+        {isEn ? 'Select your arrival point for fast handover' : 'Mobil diantar langsung ke lobi kedatangan kapal ferry atau bandara'}
+      </p>
     </div>
     <a href={isEn ? "/en/lokasi" : "/lokasi"} class="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
       <span>{isEn ? 'View All' : 'Semua Lokasi'}</span>
@@ -53,7 +66,7 @@ const hubs = selectedSlugs
   </div>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-    {hubs.map((hub) => (
+    {batamHubs.map((hub) => (
       <a
         href={isEn ? `/en/lokasi/${hub.slug}` : `/lokasi/${hub.slug}`}
         class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-sm transition-all group flex flex-col justify-between overflow-hidden"
@@ -79,3 +92,91 @@ const hubs = selectedSlugs
     ))}
   </div>
 </div>
+
+<!-- Palembang Pickup Hub Section -->
+<div
+  class:list={[
+    "my-6 transition-opacity duration-200",
+    (!showOnlyPalembang && (showOnlyBatam || isDynamicDualCity)) && "hidden"
+  ]}
+  data-city-hub="palembang"
+>
+  <div class="flex items-center justify-between mb-3">
+    <div>
+      <h2 class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+        <MapPin class="w-4 h-4 text-blue-600" />
+        <span>{isEn ? 'Pickup Points in Palembang' : 'Titik Jemput Palembang'}</span>
+      </h2>
+      <p class="text-[11px] text-slate-500">
+        {isEn ? 'Direct handover at SMB II Airport, Kertapati Station, TAA Port & hotels' : 'Mobil diantar ke Bandara SMB II, Stasiun Kertapati, Pelabuhan TAA & hotel'}
+      </p>
+    </div>
+    <a href={isEn ? "/en/lokasi" : "/lokasi"} class="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
+      <span>{isEn ? 'View All' : 'Semua Lokasi'}</span>
+      <ArrowRight class="w-3 h-3" />
+    </a>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+    {palembangHubs.map((hub) => (
+      <a
+        href={isEn ? `/en/lokasi/${hub.slug}` : `/lokasi/${hub.slug}`}
+        class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-sm transition-all group flex flex-col justify-between overflow-hidden"
+      >
+        <div class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+          <img
+            src={hub.image}
+            alt={hub.name}
+            loading="lazy"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[9px] font-bold shadow-xs">
+            {hub.badge}
+          </span>
+        </div>
+        <div class="p-2.5">
+          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5 group-hover:text-blue-600">{hub.type}</span>
+          <span class="font-bold text-xs text-slate-900 group-hover:text-blue-600 line-clamp-1">
+            {hub.name}
+          </span>
+        </div>
+      </a>
+    ))}
+  </div>
+</div>
+
+<script is:inline>
+  function syncPickupHubCity(city) {
+    const batamSection = document.querySelector('[data-city-hub="batam"]');
+    const palembangSection = document.querySelector('[data-city-hub="palembang"]');
+    if (!batamSection || !palembangSection) return;
+
+    // Check if we are on a page that allows dynamic dual-city toggling
+    if (city === 'palembang') {
+      batamSection.classList.add('hidden');
+      palembangSection.classList.remove('hidden');
+    } else {
+      palembangSection.classList.add('hidden');
+      batamSection.classList.remove('hidden');
+    }
+  }
+
+  function initPickupHubSync() {
+    // Only apply on pages where both are present
+    const batamSection = document.querySelector('[data-city-hub="batam"]');
+    const palembangSection = document.querySelector('[data-city-hub="palembang"]');
+    if (batamSection && palembangSection) {
+      const savedCity = localStorage.getItem('lincah_city') || 'batam';
+      syncPickupHubCity(savedCity);
+    }
+  }
+
+  window.addEventListener('cityChange', (e) => {
+    if (e.detail && e.detail.city) {
+      syncPickupHubCity(e.detail.city);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', initPickupHubSync);
+  document.addEventListener('astro:page-load', initPickupHubSync);
+</script>

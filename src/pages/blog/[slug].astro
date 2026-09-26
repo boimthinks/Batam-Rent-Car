@@ -1,5 +1,7 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
+import AutoLinkContent from '../../components/AutoLinkContent.astro';
+import GoogleSourcePreferences from '../../components/GoogleSourcePreferences.astro';
 import { getCollection, render } from 'astro:content';
 import { Calendar, User, ArrowLeft, MessageCircle, List, Phone, ShieldCheck, Clock, CheckCircle2 } from '@lucide/astro';
 
@@ -14,12 +16,14 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const d = post.data;
+const articleCity = d.city || 'Batam';
+const isPalembang = articleCity.toLowerCase() === 'palembang';
 
 // Filter headings untuk Table of Contents (h2 dan h3)
 const tocHeadings = (headings || []).filter((h) => h.depth === 2 || h.depth === 3);
 
 // WhatsApp URL
-const waText = `Halo Admin Lincah Rent Car, saya baru saja membaca artikel "${d.title}" dan ingin tanya info sewa mobil di Batam.`;
+const waText = `Halo Admin Lincah Rent Car, saya baru saja membaca artikel "${d.title}" dan ingin tanya info sewa mobil di ${articleCity}.`;
 const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
 
 // Article Schema.org
@@ -49,6 +53,7 @@ const articleSchema = {
   title={d.title}
   description={d.summary}
   ogImage={`https://lincahrentcar.com${d.featuredImage}`}
+  alternateUrl={d.alternateSlug ? `/en/guide/${d.alternateSlug}` : undefined}
   schema={articleSchema}
 >
   <!-- Back Button & Breadcrumbs -->
@@ -96,7 +101,9 @@ const articleSchema = {
 
       <!-- Article Body -->
       <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs blog-content">
-        <Content />
+        <AutoLinkContent lang="id">
+          <Content />
+        </AutoLinkContent>
       </div>
 
       <!-- Auto wrap any markdown table with responsive scroll container -->
@@ -117,11 +124,20 @@ const articleSchema = {
         document.addEventListener('astro:page-load', wrapBlogTables);
       </script>
 
+      <!-- Google Source Recommendation Box -->
+      <GoogleSourcePreferences variant="blog" lang="id" />
+
       <!-- Bottom In-Article WhatsApp Banner -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-3xl p-6 sm:p-8 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <h3 class="text-base sm:text-lg font-black mb-1">Rencanakan Perjalanan Anda di Batam</h3>
-          <p class="text-xs text-blue-100">Dapatkan armada bersih dengan penjemputan gratis di pelabuhan atau bandara.</p>
+          <h3 class="text-base sm:text-lg font-black mb-1">
+            Rencanakan Perjalanan Anda di {articleCity}
+          </h3>
+          <p class="text-xs text-blue-100">
+            {isPalembang
+              ? "Dapatkan armada bersih dengan penjemputan langsung di Bandara SMB II, Stasiun Kertapati, atau hotel."
+              : "Dapatkan armada bersih dengan penjemputan gratis di pelabuhan atau bandara."}
+          </p>
         </div>
         <a
           href={waUrl}
@@ -173,10 +189,12 @@ const articleSchema = {
             Butuh Rental Mobil?
           </span>
           <h3 class="text-base font-black text-slate-900 mb-2">
-            Konsultasi Rute & Unit Batam
+            Konsultasi Rute & Unit {articleCity}
           </h3>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            Admin operasional kami siap membantu memilih armada tepat untuk rute Anda, cek jadwal kapal/pesawat, dan serah terima unit gratis di pelabuhan.
+            {isPalembang
+              ? "Admin operasional kami siap membantu memilih armada tepat untuk perjalanan di Palembang, cek jadwal kedatangan Bandara SMB II / Stasiun Kertapati, dan serah terima unit tepat waktu."
+              : "Admin operasional kami siap membantu memilih armada tepat untuk rute Anda, cek jadwal kapal/pesawat, dan serah terima unit gratis di pelabuhan."}
           </p>
 
           <a
@@ -200,7 +218,11 @@ const articleSchema = {
             </div>
             <div class="flex items-start gap-2">
               <Clock class="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-              <span>Free delivery lobi Harbour Bay, Batam Centre & Bandara.</span>
+              <span>
+                {isPalembang
+                  ? "Antar unit Bandara SMB II, Stasiun Kertapati & TAA."
+                  : "Free delivery lobi Harbour Bay, Batam Centre & Bandara."}
+              </span>
             </div>
           </div>
         </div>

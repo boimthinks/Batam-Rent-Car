@@ -1,0 +1,16 @@
+---
+import { applyAutoLinks } from '../utils/autolinker';
+
+interface Props {
+  lang?: 'id' | 'en';
+  html?: string;
+}
+
+const { lang = 'id', html } = Astro.props;
+
+// Use provided HTML string (e.g. rendered bodyEn) or render the default slot.
+const rawHtml = html ?? (await Astro.slots.render('default'));
+const processedHtml = applyAutoLinks(rawHtml, lang);
+---
+
+<Fragment set:html={processedHtml} />

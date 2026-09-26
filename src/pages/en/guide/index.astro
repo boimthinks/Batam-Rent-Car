@@ -7,19 +7,19 @@ const enPosts = await getCollection('blog', ({ data }) => data.lang === 'en');
 ---
 
 <AppLayout
-  title="Batam Travel & Car Rental Guides (Singapore & Malaysia Edition)"
-  description="Practical advice for Singaporeans and Malaysians traveling to Batam: self-drive licence requirements, ferry terminal pickups, and driving advice."
+  title="Travel & Car Rental Guides (Singapore & Malaysia Edition)"
+  description="Practical advice for traveling to Batam & Palembang: self-drive licence requirements, terminal pickups, and driving advice."
   lang="en"
 >
   <div class="mb-6">
     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
       <BookOpen class="w-3.5 h-3.5" />
-      <span>Traveller Information</span>
+      <span>Traveller Information <span class="city-name-dyn">Batam</span></span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Batam Travel & Driving Guides
+      Travel & Driving Guides <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="guide-desc-en" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       Curated guides to help you navigate Batam with ease, understand local traffic rules, and make the most of your island weekend getaway.
     </p>
   </div>
@@ -28,8 +28,16 @@ const enPosts = await getCollection('blog', ({ data }) => data.lang === 'en');
     {enPosts.map((post) => {
       const slug = post.id.replace(/\.md$/, '');
       const d = post.data;
+      const city = d.city || 'Batam';
+      const isDefaultBatam = city.toLowerCase() === 'batam';
       return (
-        <article class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all">
+        <article
+          class:list={[
+            "guide-card bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all",
+            !isDefaultBatam && "hidden"
+          ]}
+          data-city={city}
+        >
           <div>
             <a href={`/en/guide/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
               <img
@@ -40,9 +48,14 @@ const enPosts = await getCollection('blog', ({ data }) => data.lang === 'en');
               />
             </a>
             <div class="p-5">
-              <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 mb-2">
-                <Calendar class="w-3.5 h-3.5" />
-                <span>{d.pubDate.toLocaleDateString('en-SG', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <div class="flex items-center justify-between gap-2 text-[11px] font-bold text-slate-400 mb-2">
+                <span class="flex items-center gap-1.5">
+                  <Calendar class="w-3.5 h-3.5 text-blue-600" />
+                  <span>{d.pubDate.toLocaleDateString('en-SG', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100">
+                  {city}
+                </span>
               </div>
 
               <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
@@ -68,4 +81,52 @@ const enPosts = await getCollection('blog', ({ data }) => data.lang === 'en');
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncEnGuidePageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      document.title = isPalembang
+        ? 'Palembang Travel & Car Rental Guides | Lincah Rent Car'
+        : 'Batam Travel & Car Rental Guides | Lincah Rent Car';
+
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      const descEl = document.getElementById('guide-desc-en');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Curated guides to help you navigate Palembang with ease: SMB II Airport car pickups, culinary destinations, and regional travel tips.'
+          : 'Curated guides to help you navigate Batam with ease, understand local traffic rules, and make the most of your island weekend getaway.';
+      }
+
+      const cards = document.querySelectorAll('.guide-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initEnGuideCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncEnGuidePageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncEnGuidePageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initEnGuideCitySync);
+    document.addEventListener('astro:page-load', initEnGuideCitySync);
+  </script>
 </AppLayout>

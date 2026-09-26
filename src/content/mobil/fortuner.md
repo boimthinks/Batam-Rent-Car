@@ -16,12 +16,22 @@ features:
   - "Power Backdoor Elektrik"
   - "Bagasi Fleksibel Lipat"
 popularFor: "Keluarga aktif, perjalanan tugas kantor, dan trip santai ke jembatan Barelang"
+titleEn: "Rent Toyota Fortuner VRZ in Batam - The Family Favourite SUV"
+popularForEn: "Active families, office duty travel, and relaxed trips to the Barelang Bridge"
+featuresEn:
+  - "Efficient & high-torque 2.4L diesel engine"
+  - "High ground clearance of 225 mm"
+  - "Dual-zone digital air conditioning"
+  - "Electric power backdoor"
+  - "Flexible foldable boot space"
 pickupLocations:
   - "Bandara Hang Nadim"
   - "Harbour Bay Ferry Terminal"
   - "Batam Centre Ferry Terminal"
 image: "/images/cars/Sewa-Toyota-Fortuner-VRZ-Batam.webp"
 featured: false
+bodyEn: |
+  The Toyota Fortuner VRZ is the benchmark for rugged SUVs in Indonesia. Comfortable over smooth asphalt as well as the undulating roads found across Batam island.
 ---
 
 Toyota Fortuner VRZ adalah standar SUV tangguh di Indonesia. Nyaman dibawa melewati jalanan beraspal mulus maupun jalanan bergelombang di penjuru pulau Batam.

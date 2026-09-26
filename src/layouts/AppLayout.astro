@@ -2,6 +2,7 @@
 import StickyTopBar from '../components/StickyTopBar.astro';
 import BottomNavBar from '../components/BottomNavBar.astro';
 import LanguageBanner from '../components/LanguageBanner.astro';
+import GoogleSourcePreferences from '../components/GoogleSourcePreferences.astro';
 import { ClientRouter } from 'astro:transitions';
 import { getAlternateUrl } from '../utils/i18n';
 import { MapPin, Phone, Clock, ShieldCheck, Award } from '@lucide/astro';
@@ -12,6 +13,7 @@ interface Props {
   description?: string;
   lang?: 'id' | 'en';
   canonicalUrl?: string;
+  alternateUrl?: string;
   ogImage?: string;
   schema?: Record<string, any> | Record<string, any>[];
 }
@@ -21,6 +23,7 @@ const {
   description = "Sewa mobil murah di Batam lepas kunci & dengan supir. Unit bersih, terawat, antar-jemput gratis di Bandara Hang Nadim & Pelabuhan Batam Centre / Harbour Bay.",
   lang = 'id',
   canonicalUrl,
+  alternateUrl,
   ogImage = 'https://lincahrentcar.com/images/blog/pelabuhan-batam.svg',
   schema,
 } = Astro.props;
@@ -29,10 +32,14 @@ const currentPath = Astro.url.pathname;
 const siteUrl = 'https://lincahrentcar.com';
 const resolvedCanonical = canonicalUrl || `${siteUrl}${currentPath}`;
 
-// Calculate alternate hreflangs using unified i18n helper
+// Calculate alternate hreflangs using unified i18n helper or explicit alternateUrl
 const isEn = lang === 'en';
-const idUrl = `${siteUrl}${getAlternateUrl(currentPath, 'id')}`;
-const enUrl = `${siteUrl}${getAlternateUrl(currentPath, 'en')}`;
+const idUrl = isEn
+  ? (alternateUrl ? `${siteUrl}${alternateUrl}` : `${siteUrl}${getAlternateUrl(currentPath, 'id')}`)
+  : `${siteUrl}${getAlternateUrl(currentPath, 'id')}`;
+const enUrl = !isEn
+  ? (alternateUrl ? `${siteUrl}${alternateUrl}` : `${siteUrl}${getAlternateUrl(currentPath, 'en')}`)
+  : `${siteUrl}${getAlternateUrl(currentPath, 'en')}`;
 
 const defaultLocalBusinessSchema = {
   "@context": "https://schema.org",
@@ -77,6 +84,8 @@ const finalSchemas = schema
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{title} | Lincah Rent Car Batam</title>
@@ -90,6 +99,9 @@ const finalSchemas = schema
     <link rel="alternate" hreflang="id" href={idUrl} />
     <link rel="alternate" hreflang="en" href={enUrl} />
     <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
+
+    <!-- LLM agent discoverability (llms.txt standard) -->
+    <link rel="describedby" type="text/markdown" href="/llms.txt" title="Lincah Rent Car overview for LLM agents" />
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -114,10 +126,10 @@ const finalSchemas = schema
   </head>
   <body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 pb-20 md:pb-0">
     <!-- Language Suggestion Banner -->
-    <LanguageBanner currentLang={lang} />
+    <LanguageBanner currentLang={lang} alternateUrl={alternateUrl} />
 
     <!-- Sticky App Header -->
-    <StickyTopBar lang={lang} currentPath={currentPath} />
+    <StickyTopBar lang={lang} currentPath={currentPath} alternateUrl={alternateUrl} />
 
     <!-- Main Container -->
     <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 md:py-8">
@@ -130,13 +142,20 @@ const finalSchemas = schema
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <!-- Col 1: Brand Info -->
           <div class="md:col-span-1">
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black">
-                L
+            <div class="flex items-center gap-2.5 mb-3">
+              <img
+                src="/favicon.svg"
+                alt="Lincah Rent Car Logo"
+                class="w-8 h-8 rounded-lg shrink-0"
+                width="32"
+                height="32"
+              />
+              <div class="flex flex-col">
+                <span class="font-extrabold text-lg text-white leading-none">LINCAH<span class="text-blue-500">RENT</span></span>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5" id="footer-brand-subtitle">Batam Car Rental</span>
               </div>
-              <span class="font-extrabold text-lg text-white">LINCAH<span class="text-blue-500">RENT</span></span>
             </div>
-            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            <p class="text-xs text-slate-400 leading-relaxed mb-4" id="footer-brand-desc">
               {isEn
                 ? "Fast, comfortable, and flexible car rental in Batam. Self-drive and chauffeur services with free pickup at ferry terminals and airport."
                 : "Sewa mobil cepat, nyaman, dan fleksibel di Batam. Layanan lepas kunci & dengan supir dengan serah terima gratis di pelabuhan & bandara."}
@@ -145,6 +164,9 @@ const finalSchemas = schema
               <Clock class="w-4 h-4 text-emerald-400" />
               <span>Standby 24 Jam Setiap Hari</span>
             </div>
+
+            <!-- Google Source Recommendation in Footer -->
+            <GoogleSourcePreferences variant="footer" lang={lang} />
           </div>
 
           <!-- Col 2: Navigation -->
@@ -165,33 +187,81 @@ const finalSchemas = schema
           <!-- Col 3: Pickup Hubs -->
           <div>
             <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              {isEn ? "Top Pickup Hubs" : "Titik Jemput Populer"}
+              <span
+                id="footer-hubs-title"
+                data-title-batam={isEn ? "Top Pickup Hubs (Batam)" : "Titik Jemput Populer (Batam)"}
+                data-title-palembang={isEn ? "Top Pickup Hubs (Palembang)" : "Titik Jemput Populer (Palembang)"}
+              >
+                {isEn ? "Top Pickup Hubs (Batam)" : "Titik Jemput Populer (Batam)"}
+              </span>
             </h3>
-            <ul class="space-y-2 text-xs text-slate-400">
+
+            <!-- Batam Hubs -->
+            <ul class="space-y-2 text-xs text-slate-400" id="footer-hubs-batam">
               <li><a href={isEn ? "/en/lokasi/batam-centre" : "/lokasi/batam-centre"} class="hover:text-white transition-colors">Batam Centre Ferry Terminal</a></li>
               <li><a href={isEn ? "/en/lokasi/harbour-bay" : "/lokasi/harbour-bay"} class="hover:text-white transition-colors">Harbour Bay Ferry Terminal</a></li>
               <li><a href={isEn ? "/en/lokasi/hang-nadim" : "/lokasi/hang-nadim"} class="hover:text-white transition-colors">Bandara Hang Nadim (BTH)</a></li>
               <li><a href={isEn ? "/en/lokasi/sekupang" : "/lokasi/sekupang"} class="hover:text-white transition-colors">Sekupang Ferry Terminal</a></li>
               <li><a href={isEn ? "/en/lokasi/mega-legenda" : "/lokasi/mega-legenda"} class="hover:text-white transition-colors">Mega Legenda 2 (Kantor Pusat)</a></li>
             </ul>
+
+            <!-- Palembang Hubs -->
+            <ul class="space-y-2 text-xs text-slate-400 hidden" id="footer-hubs-palembang">
+              <li><a href={isEn ? "/en/lokasi/bandara-smb2-palembang" : "/lokasi/bandara-smb2-palembang"} class="hover:text-white transition-colors">Bandara SMB II (PLM)</a></li>
+              <li><a href={isEn ? "/en/lokasi/stasiun-kertapati-lrt-palembang" : "/lokasi/stasiun-kertapati-lrt-palembang"} class="hover:text-white transition-colors">Stasiun Kertapati & LRT</a></li>
+              <li><a href={isEn ? "/en/lokasi/pelabuhan-tanjung-api-api" : "/lokasi/pelabuhan-tanjung-api-api"} class="hover:text-white transition-colors">Pelabuhan Tanjung Api-Api (TAA)</a></li>
+              <li><a href={isEn ? "/en/lokasi/pusat-kota-sudirman-palembang" : "/lokasi/pusat-kota-sudirman-palembang"} class="hover:text-white transition-colors">Pusat Kota & Jl. Sudirman</a></li>
+              <li><a href={isEn ? "/en/lokasi/ptc-mall-r-sukamto-palembang" : "/lokasi/ptc-mall-r-sukamto-palembang"} class="hover:text-white transition-colors">R. Sukamto & PTC Mall</a></li>
+              <li><a href={isEn ? "/en/lokasi/jakabaring-sport-city-palembang" : "/lokasi/jakabaring-sport-city-palembang"} class="hover:text-white transition-colors">Jakabaring Sport City</a></li>
+            </ul>
           </div>
 
           <!-- Col 4: Contact & Address -->
           <div>
             <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              {isEn ? "Head Office" : "Kantor & Kontak"}
+              {isEn ? "Offices & Contact" : "Kantor & Kontak"}
             </h3>
-            <div class="space-y-2.5 text-xs text-slate-400">
-              <div class="flex items-start gap-2">
-                <MapPin class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                <span class="leading-relaxed">
-                  Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai - Batam, Kepri 29431
-                </span>
+            <div class="space-y-3 text-xs text-slate-400">
+              <!-- Batam Office -->
+              <div id="footer-office-batam" class="space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-bold text-slate-300">
+                    {isEn ? "Batam Office (HQ):" : "Kantor Batam (Pusat):"}
+                  </span>
+                  <span id="office-batam-badge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-600/30 text-blue-300 border border-blue-500/30">
+                    {isEn ? "Active City" : "Kota Aktif"}
+                  </span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <MapPin class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                  <span class="leading-relaxed text-[11px]">
+                    Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai - Batam, Kepri 29431
+                  </span>
+                </div>
               </div>
-              <div class="flex items-center gap-2">
+
+              <!-- Palembang Office -->
+              <div id="footer-office-palembang" class="space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-bold text-slate-300">
+                    {isEn ? "Palembang Branch:" : "Kantor Palembang:"}
+                  </span>
+                  <span id="office-palembang-badge" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-600/30 text-blue-300 border border-blue-500/30 hidden">
+                    {isEn ? "Active City" : "Kota Aktif"}
+                  </span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <MapPin class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                  <span class="leading-relaxed text-[11px]">
+                    Lorong Tj. Burung Utama, Bukit Lama, Kec. Ilir Bar. I, Kota Palembang, Sumatera Selatan 30139
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
                 <Phone class="w-4 h-4 text-emerald-400 shrink-0" />
                 <a href="https://wa.me/6281373703639" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline font-semibold">
-                  0813-7370-3639 (WA CS)
+                  0813-7370-3639 (WA CS 24 Jam)
                 </a>
               </div>
             </div>

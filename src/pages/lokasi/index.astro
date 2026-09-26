@@ -8,7 +8,7 @@ const locations = await getCollection('lokasi');
 
 <AppLayout
   title="Titik Jemput Rental Mobil Batam - Bandara & Pelabuhan Ferry"
-  description="Layanan antar-jemput rental mobil di seluruh hub strategis Batam: Bandara Hang Nadim, Harbour Bay Ferry Terminal, Batam Centre, Sekupang, dan Mega Legenda."
+  description="Layanan antar-jemput rental mobil di seluruh hub strategis: Bandara, Stasiun Kereta, Terminal Ferry, dan Pusat Kota."
 >
   <div class="mb-6">
     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
@@ -16,19 +16,27 @@ const locations = await getCollection('lokasi');
       <span>Titik Antar-Jemput Lincah Rent Car</span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Hub Penjemputan Mobil di Batam
+      Hub Penjemputan Mobil di <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-      Anda tidak perlu repot mencari kantor rental saat baru tiba. Tim kami siap mengantar unit mobil pesanan Anda langsung ke lobi kedatangan kapal ferry atau pintu keluar bandara.
+    <p id="lokasi-desc" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+      Anda tidak perlu repot mencari kantor rental saat baru tiba. Tim kami siap mengantar unit mobil pesanan Anda langsung ke lobi kedatangan kapal ferry atau pintu keluar bandara di Batam.
     </p>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 my-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 my-6" id="locations-grid">
     {locations.map((loc) => {
       const slug = loc.id.replace(/\.md$/, '');
       const d = loc.data;
+      const city = d.city || 'Batam';
+      const isDefaultBatam = city.toLowerCase() === 'batam';
       return (
-        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+        <div
+          class:list={[
+            "loc-card bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group",
+            !isDefaultBatam && "hidden"
+          ]}
+          data-city={city}
+        >
           <div>
             <!-- Gambar Lokasi 4:3 -->
             <a href={`/lokasi/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
@@ -82,4 +90,56 @@ const locations = await getCollection('lokasi');
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncLokasiPageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Update document.title
+      document.title = isPalembang
+        ? 'Titik Jemput Rental Mobil Palembang - Bandara SMB II, Stasiun & Pelabuhan TAA | Lincah Rent Car Batam'
+        : 'Titik Jemput Rental Mobil Batam - Bandara & Pelabuhan Ferry | Lincah Rent Car Batam';
+
+      // Update H1 .city-name-dyn
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      // Update description
+      const descEl = document.getElementById('lokasi-desc');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Anda tidak perlu repot mencari kantor rental saat baru tiba. Tim kami siap mengantar unit mobil pesanan Anda langsung ke lobi kedatangan Bandara SMB II, Stasiun Kertapati, Pelabuhan Tanjung Api-Api, maupun hotel di Palembang.'
+          : 'Anda tidak perlu repot mencari kantor rental saat baru tiba. Tim kami siap mengantar unit mobil pesanan Anda langsung ke lobi kedatangan kapal ferry atau pintu keluar bandara di Batam.';
+      }
+
+      // Filter cards by city
+      const cards = document.querySelectorAll('.loc-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initLokasiCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncLokasiPageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncLokasiPageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initLokasiCitySync);
+    document.addEventListener('astro:page-load', initLokasiCitySync);
+  </script>
 </AppLayout>

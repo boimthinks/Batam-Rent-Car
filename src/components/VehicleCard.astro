@@ -20,6 +20,11 @@ interface Props {
     pickupLocations: string[];
     image: string;
     featured?: boolean;
+    // English (optional)
+    titleEn?: string;
+    popularForEn?: string;
+    featuresEn?: string[];
+    categoryEn?: string;
   };
   lang?: 'id' | 'en';
 }
@@ -34,6 +39,11 @@ const waUrl = buildWhatsAppUrl({
 
 const detailUrl = isEn ? `/en/car/${slug}` : `/mobil/${slug}`;
 const hasSelfDrive = Boolean(data.priceDailySelfDrive);
+
+// Use English content when available (falls back to Indonesian)
+const cardTitle = isEn ? (data.titleEn || data.title) : data.title;
+const cardPopularFor = isEn ? (data.popularForEn || data.popularFor) : data.popularFor;
+const cardCategory = isEn ? (data.categoryEn || data.category) : data.category;
 ---
 
 <div
@@ -46,14 +56,14 @@ const hasSelfDrive = Boolean(data.priceDailySelfDrive);
   <a href={detailUrl} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block cursor-pointer">
     <img
       src={data.image}
-      alt={data.title}
+      alt={cardTitle}
       loading="lazy"
       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
     />
     
     <!-- Category Badge -->
     <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-[11px] font-bold shadow-xs">
-      {data.category}
+      {cardCategory}
     </span>
 
     {data.featured && (
@@ -71,7 +81,7 @@ const hasSelfDrive = Boolean(data.priceDailySelfDrive);
           <h3 class="font-extrabold text-slate-900 text-base group-hover:text-blue-600 transition-colors">
             <a href={detailUrl}>{data.carModel}</a>
           </h3>
-          <p class="text-xs text-slate-500 line-clamp-1">{data.popularFor}</p>
+          <p class="text-xs text-slate-500 line-clamp-1">{cardPopularFor}</p>
         </div>
       </div>
 
@@ -133,9 +143,11 @@ const hasSelfDrive = Boolean(data.priceDailySelfDrive);
         <!-- WhatsApp Green Action -->
         <a
           href={waUrl}
+          data-car-model={data.carModel}
+          data-lang={lang}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-colors shadow-xs"
+          class="btn-wa-card flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-colors shadow-xs"
         >
           <MessageCircle class="w-3.5 h-3.5 fill-current" />
           <span>{isEn ? 'Book WA' : 'Sewa WA'}</span>

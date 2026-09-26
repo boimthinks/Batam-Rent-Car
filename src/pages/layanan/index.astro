@@ -15,9 +15,9 @@ const services = await getCollection('layanan');
       Layanan Lincah Rent Car
     </span>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Solusi Transportasi Fleksibel di Seluruh Batam
+      Solusi Transportasi Fleksibel di Seluruh <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="layanan-desc" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       Sesuaikan kebutuhan mobilitas Anda dengan paket rental lepas kunci, pengemudi profesional, antar jemput pelabuhan, hingga sewa kontrak bulanan untuk operasional bisnis.
     </p>
   </div>
@@ -77,4 +77,45 @@ const services = await getCollection('layanan');
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncLayananTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Update document.title
+      document.title = isPalembang
+        ? 'Layanan Rental Mobil Palembang - Lepas Kunci, Supir & Antar Jemput | Lincah Rent Car Batam'
+        : 'Layanan Rental Mobil Batam - Lepas Kunci, Supir & Antar Jemput | Lincah Rent Car Batam';
+
+      // Update .city-name-dyn
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      // Update description
+      const descEl = document.getElementById('layanan-desc');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Sesuaikan kebutuhan mobilitas Anda di Palembang dengan paket rental lepas kunci, pengemudi profesional, antar jemput Bandara SMB II & Stasiun Kertapati, hingga sewa kontrak bulanan untuk operasional bisnis.'
+          : 'Sesuaikan kebutuhan mobilitas Anda dengan paket rental lepas kunci, pengemudi profesional, antar jemput pelabuhan dan bandara, hingga sewa kontrak bulanan untuk operasional bisnis di Batam.';
+      }
+    }
+
+    function initLayananCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncLayananTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncLayananTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initLayananCitySync);
+    document.addEventListener('astro:page-load', initLayananCitySync);
+  </script>
 </AppLayout>

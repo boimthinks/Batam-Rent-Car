@@ -27,7 +27,7 @@ const sheetCars = sortedCars.map((c) => ({
   data: c.data,
 }));
 
-const faqItems = [
+const faqItemsBatam = [
   {
     question: "Apa saja syarat sewa mobil lepas kunci di Batam?",
     answer: "Untuk wisatawan dari luar Batam, persyaratannya cukup mudah: foto KTP asli, foto SIM A aktif, tiket transportasi PP (pesawat/ferry), dan bukti reservasi hotel. Verifikasi dokumen dilakukan secara online via WhatsApp dalam waktu kurang dari 15 menit."
@@ -41,12 +41,35 @@ const faqItems = [
     answer: "Bisa. Wisatawan asal Singapura dan Malaysia dapat menyewa mobil lepas kunci dengan menunjukkan Paspor, Surat Izin Mengemudi yang sah (Driving Licence Singapore/Malaysia), serta tiket kapal ferry kepulangan."
   },
   {
-    question: "Berapa jam hitungan sewa harian di Lincah Rent Car?",
+    question: "Berapa jam hitungan sewa harian di Lincah Rent Car Batam?",
     answer: "Sewa lepas kunci dihitung 24 jam penuh per hari sejak jam serah terima kunci. Sedangkan untuk paket sewa dengan supir, durasinya adalah 12 jam per hari kerja di area Pulau Batam."
   },
   {
-    question: "Bagaimana sistem pembayaran dan booking rental mobil?",
+    question: "Bagaimana sistem pembayaran dan booking rental mobil Batam?",
     answer: "Pemesanan dapat langsung dikonfirmasi melalui admin WhatsApp kami di 0813-7370-3639. Pembayaran dapat dilakukan via transfer bank atau pelunasan saat serah terima kunci di lokasi."
+  }
+];
+
+const faqItemsPalembang = [
+  {
+    question: "Apa saja syarat sewa mobil lepas kunci di Palembang?",
+    answer: "Syarat mudah untuk wisatawan maupun warga Palembang: foto KTP/e-KTP asli, SIM A yang masih berlaku, bukti tiket transportasi PP (pesawat/kereta/travel) atau booking hotel. Verifikasi data online via WhatsApp dalam 10-15 menit."
+  },
+  {
+    question: "Apakah bisa antar-jemput mobil di Bandara SMB II atau Pelabuhan Tanjung Api-Api?",
+    answer: "Sangat bisa! Kami melayani pengantaran armada langsung ke lobi kedatangan Bandara Internasional Sultan Mahmud Badaruddin II (SMB II), Stasiun Kereta Api Kertapati, lobi hotel, hingga Pelabuhan Tanjung Api-Api untuk tamu penyeberangan dari Pulau Bangka."
+  },
+  {
+    question: "Apakah tersedia paket rental mobil dengan supir di Palembang?",
+    answer: "Ya, kami menyediakan layanan rental mobil dengan driver lokal berpengalaman yang menguasai jalanan Kota Palembang, rute kuliner pempek, kawasan bisnis Sudirman, Jakabaring, hingga area industri di Sumatera Selatan."
+  },
+  {
+    question: "Berapa jam durasi sewa harian mobil di Palembang?",
+    answer: "Untuk paket sewa lepas kunci dihitung 24 jam penuh per hari. Untuk paket dengan supir, durasi standar operasional adalah 12 jam per hari kerja."
+  },
+  {
+    question: "Bagaimana cara booking mobil rental di Palembang?",
+    answer: "Hubungi WhatsApp admin Lincah Rent Car di 0813-7370-3639. Tentukan pilihan mobil, tanggal sewa, dan titik penjemputan (Bandara SMB II, Stasiun, atau Hotel)."
   }
 ];
 ---
@@ -64,20 +87,21 @@ const faqItems = [
     <div class="relative z-10 max-w-2xl">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-blue-100 text-xs font-bold mb-3 border border-white/20">
         <Sparkles class="w-3.5 h-3.5 text-amber-300" />
-        <span>Sewa Mobil Batam Cepat & Terpercaya</span>
+        <span id="hero-badge-city">Sewa Mobil Batam Cepat & Terpercaya</span>
       </div>
 
       <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-2 sm:mb-3">
-        Sewa Mobil Cepat, Nyaman, & Fleksibel di Batam
+        Sewa Mobil <span class="city-name-dyn">Batam</span>: Cepat, Nyaman, & Fleksibel
       </h1>
 
-      <p class="text-xs sm:text-sm text-blue-100/90 leading-relaxed mb-5">
+      <p class="text-xs sm:text-sm text-blue-100/90 leading-relaxed mb-5" id="hero-desc">
         Lepas kunci 24 jam atau dengan supir profesional. Serah terima gratis langsung di lobi Harbour Bay, Batam Centre Ferry Terminal, dan Bandara Hang Nadim.
       </p>
 
       <!-- Action Buttons -->
       <div class="flex flex-wrap items-center gap-3">
         <a
+          id="hero-wa-btn"
           href="https://wa.me/6281373703639?text=Halo%20Admin%20Lincah%20Rent%20Car,%20saya%20tertarik%20sewa%20mobil%20di%20Batam.%20Mohon%20info%20ketersediaan%20unit"
           target="_blank"
           rel="noopener noreferrer"
@@ -108,7 +132,7 @@ const faqItems = [
         </div>
         <div class="flex items-center gap-1.5">
           <Clock class="w-4 h-4 text-sky-300 shrink-0" />
-          <span>Antar Pelabuhan Cepat</span>
+          <span id="hero-trust-pickup">Antar Pelabuhan Cepat</span>
         </div>
       </div>
     </div>
@@ -123,7 +147,7 @@ const faqItems = [
       <h2 class="text-sm sm:text-base font-black text-slate-900 uppercase tracking-wider">
         Pilihan Unit Mobil
       </h2>
-      <p class="text-xs text-slate-500">Pilih tipe kendaraan sesuai kebutuhan perjalanan Anda di Batam</p>
+      <p class="text-xs text-slate-500">Pilih tipe kendaraan sesuai kebutuhan perjalanan Anda di <span class="city-name-dyn">Batam</span></p>
     </div>
   </div>
 
@@ -146,7 +170,7 @@ const faqItems = [
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 class="text-base sm:text-lg font-black text-slate-900">Layanan Unggulan Kami</h2>
-        <p class="text-xs text-slate-500">Solusi transportasi lengkap untuk liburan, dinas, maupun bisnis di Batam</p>
+        <p class="text-xs text-slate-500">Solusi transportasi lengkap untuk liburan, dinas, maupun bisnis di <span class="city-name-dyn">Batam</span></p>
       </div>
       <a href="/layanan" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
         <span>Semua Layanan</span>
@@ -157,10 +181,14 @@ const faqItems = [
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {allServices.map((srv) => {
         const slug = srv.id.replace(/\.md$/, '');
+        const isFeatured = slug === 'antar-jemput-bandara-pelabuhan';
         return (
           <a
             href={`/layanan/${slug}`}
-            class="rounded-2xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-blue-300 hover:shadow-md transition-all group flex flex-col justify-between overflow-hidden"
+            class:list={[
+              "rounded-2xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-blue-300 hover:shadow-md transition-all group flex flex-col justify-between overflow-hidden",
+              isFeatured && "sm:col-span-2 lg:col-span-2 lg:row-span-2"
+            ]}
           >
             <div>
               <div class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
@@ -193,12 +221,16 @@ const faqItems = [
     </div>
   </section>
 
-  <!-- Section Blog / Edukasi Wisata & Rute Batam -->
+  <!-- Section Blog / Edukasi Wisata & Rute -->
   <section class="my-10">
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h2 class="text-base sm:text-lg font-black text-slate-900">Panduan & Tips Wisata Batam</h2>
-        <p class="text-xs text-slate-500">Informasi praktis pelabuhan, rute Jembatan Barelang, & syarat sewa</p>
+        <h2 class="text-base sm:text-lg font-black text-slate-900">
+          Panduan & Tips Wisata <span class="city-name-dyn">Batam</span>
+        </h2>
+        <p class="text-xs text-slate-500" id="blog-section-subtitle">
+          Informasi praktis pelabuhan, rute perjalanan, & syarat sewa mobil di Batam
+        </p>
       </div>
       <a href="/blog" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
         <span>Lihat Semua Artikel</span>
@@ -206,11 +238,19 @@ const faqItems = [
       </a>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {blogPosts.slice(0, 3).map((post) => {
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="home-blog-grid">
+      {blogPosts.map((post) => {
         const slug = post.id.replace(/\.md$/, '');
+        const postCity = post.data.city || 'Batam';
+        const isDefaultBatam = postCity.toLowerCase() === 'batam';
         return (
-          <article class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col group hover:shadow-md transition-all">
+          <article
+            class:list={[
+              "blog-article-card bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col group hover:shadow-md transition-all",
+              !isDefaultBatam && "hidden"
+            ]}
+            data-article-city={postCity}
+          >
             <a href={`/blog/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
               <img
                 src={post.data.featuredImage}
@@ -221,9 +261,14 @@ const faqItems = [
             </a>
             <div class="p-4 flex-1 flex flex-col justify-between">
               <div>
-                <span class="text-[10px] font-bold text-slate-400 block mb-1">
-                  {post.data.pubDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </span>
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[10px] font-bold text-slate-400">
+                    {post.data.pubDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                    {postCity}
+                  </span>
+                </div>
                 <h3 class="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
                   <a href={`/blog/${slug}`}>{post.data.title}</a>
                 </h3>
@@ -242,9 +287,107 @@ const faqItems = [
     </div>
   </section>
 
-  <!-- FAQ Accordion with Schema.org FAQPage -->
-  <FaqAccordion items={faqItems} lang="id" />
+  <!-- FAQ Accordion Batam -->
+  <div id="faq-section-batam">
+    <FaqAccordion items={faqItemsBatam} title="Pertanyaan Umum Seputar Rental Mobil di Batam" lang="id" />
+  </div>
+
+  <!-- FAQ Accordion Palembang -->
+  <div id="faq-section-palembang" class="hidden">
+    <FaqAccordion items={faqItemsPalembang} title="Pertanyaan Umum Seputar Rental Mobil di Palembang" lang="id" />
+  </div>
 
   <!-- Bottom Sheet Modal (Interactivity island) -->
   <BottomSheetModal cars={sheetCars} lang="id" />
+
+  <script is:inline>
+    function syncHomePageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Update all .city-name-dyn elements
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      // Update hero badge
+      const heroBadge = document.getElementById('hero-badge-city');
+      if (heroBadge) {
+        heroBadge.textContent = isPalembang
+          ? 'Sewa Mobil Palembang Cepat & Terpercaya'
+          : 'Sewa Mobil Batam Cepat & Terpercaya';
+      }
+
+      // Update hero description
+      const heroDesc = document.getElementById('hero-desc');
+      if (heroDesc) {
+        heroDesc.textContent = isPalembang
+          ? 'Lepas kunci 24 jam atau dengan supir profesional. Serah terima mobil langsung di lobi Bandara SMB II, Stasiun Kertapati, Pelabuhan Tanjung Api-Api, dan hotel seputaran Palembang.'
+          : 'Lepas kunci 24 jam atau dengan supir profesional. Serah terima gratis langsung di lobi Harbour Bay, Batam Centre Ferry Terminal, dan Bandara Hang Nadim.';
+      }
+
+      // Update hero WhatsApp button URL
+      const heroWa = document.getElementById('hero-wa-btn');
+      if (heroWa) {
+        const text = isPalembang
+          ? 'Halo Admin Lincah Rent Car, saya tertarik sewa mobil di Palembang. Mohon info ketersediaan unit'
+          : 'Halo Admin Lincah Rent Car, saya tertarik sewa mobil di Batam. Mohon info ketersediaan unit';
+        heroWa.href = `https://wa.me/6281373703639?text=${encodeURIComponent(text)}`;
+      }
+
+      // Update hero trust badge
+      const heroPickup = document.getElementById('hero-trust-pickup');
+      if (heroPickup) {
+        heroPickup.textContent = isPalembang ? 'Antar Bandara & Stasiun' : 'Antar Pelabuhan Cepat';
+      }
+
+      // Update blog section subtitle
+      const blogSub = document.getElementById('blog-section-subtitle');
+      if (blogSub) {
+        blogSub.textContent = isPalembang
+          ? 'Panduan rute Bandara SMB II, destinasi kuliner pempek, & tips sewa mobil di Palembang'
+          : 'Informasi praktis pelabuhan, rute perjalanan, & syarat sewa mobil di Batam';
+      }
+
+      // Filter blog article cards based on city
+      const articleCards = document.querySelectorAll('.blog-article-card');
+      articleCards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-article-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Toggle FAQ sections based on city
+      const faqBatam = document.getElementById('faq-section-batam');
+      const faqPalembang = document.getElementById('faq-section-palembang');
+      if (faqBatam && faqPalembang) {
+        if (isPalembang) {
+          faqBatam.classList.add('hidden');
+          faqPalembang.classList.remove('hidden');
+        } else {
+          faqPalembang.classList.add('hidden');
+          faqBatam.classList.remove('hidden');
+        }
+      }
+    }
+
+    function initHomePageCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncHomePageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncHomePageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initHomePageCitySync);
+    document.addEventListener('astro:page-load', initHomePageCitySync);
+  </script>
 </AppLayout>

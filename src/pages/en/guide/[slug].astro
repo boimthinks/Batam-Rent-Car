@@ -1,5 +1,7 @@
 ---
 import AppLayout from '../../../layouts/AppLayout.astro';
+import AutoLinkContent from '../../../components/AutoLinkContent.astro';
+import GoogleSourcePreferences from '../../../components/GoogleSourcePreferences.astro';
 import { getCollection, render } from 'astro:content';
 import { Calendar, User, ArrowLeft, MessageCircle, List, Phone, ShieldCheck, Clock } from '@lucide/astro';
 
@@ -14,12 +16,14 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const d = post.data;
+const articleCity = d.city || 'Batam';
+const isPalembang = articleCity.toLowerCase() === 'palembang';
 
 // Filter headings for TOC (h2 and h3)
 const tocHeadings = (headings || []).filter((h) => h.depth === 2 || h.depth === 3);
 
 // WhatsApp URL for EN
-const waText = `Hi Lincah Rent Car, I read your guide "${d.title}" and would like to inquire about car rental in Batam.`;
+const waText = `Hi Lincah Rent Car, I read your guide "${d.title}" and would like to inquire about car rental in ${articleCity}.`;
 const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
 
 const articleSchema = {
@@ -49,6 +53,7 @@ const articleSchema = {
   description={d.summary}
   ogImage={`https://lincahrentcar.com${d.featuredImage}`}
   lang="en"
+  alternateUrl={d.alternateSlug ? `/blog/${d.alternateSlug}` : undefined}
   schema={articleSchema}
 >
   <!-- Back Button & Breadcrumbs -->
@@ -96,7 +101,9 @@ const articleSchema = {
 
       <!-- Article Body -->
       <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs blog-content">
-        <Content />
+        <AutoLinkContent lang="en">
+          <Content />
+        </AutoLinkContent>
       </div>
 
       <!-- Auto wrap any markdown table with responsive scroll container -->
@@ -117,11 +124,20 @@ const articleSchema = {
         document.addEventListener('astro:page-load', wrapBlogTables);
       </script>
 
+      <!-- Google Source Recommendation Box -->
+      <GoogleSourcePreferences variant="blog" lang="en" />
+
       <!-- Bottom WhatsApp CTA Box -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-3xl p-6 sm:p-8 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <h3 class="text-base sm:text-lg font-black mb-1">Planning Your Weekend in Batam?</h3>
-          <p class="text-xs text-blue-100">Reserve your car in advance with direct ferry arrival pickup.</p>
+          <h3 class="text-base sm:text-lg font-black mb-1">
+            Planning Your Trip in {articleCity}?
+          </h3>
+          <p class="text-xs text-blue-100">
+            {isPalembang
+              ? "Reserve your car in advance with direct SMB II Airport, Kertapati Station, or hotel pickup."
+              : "Reserve your car in advance with direct ferry arrival pickup."}
+          </p>
         </div>
         <a
           href={waUrl}
@@ -173,10 +189,12 @@ const articleSchema = {
             Need a Rental Car?
           </span>
           <h3 class="text-base font-black text-slate-900 mb-2">
-            Instant Batam Booking
+            Instant {articleCity} Booking
           </h3>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            Visiting from Singapore or Malaysia? Our team will meet you directly at Harbour Bay or Batam Centre Ferry Terminal with keys ready.
+            {isPalembang
+              ? "Visiting Palembang for business or tourism? Our team will meet you directly at SMB II Airport, Kertapati Station, or your hotel with keys ready."
+              : "Visiting from Singapore or Malaysia? Our team will meet you directly at Harbour Bay or Batam Centre Ferry Terminal with keys ready."}
           </p>
 
           <a
@@ -196,11 +214,15 @@ const articleSchema = {
             </div>
             <div class="flex items-start gap-2">
               <ShieldCheck class="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
-              <span>Valid SG/MY driving licence accepted. Self-drive & driver.</span>
+              <span>Valid driving licence accepted. Self-drive & driver options.</span>
             </div>
             <div class="flex items-start gap-2">
               <Clock class="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-              <span>Complimentary ferry terminal handover upon arrival.</span>
+              <span>
+                {isPalembang
+                  ? "Handover available at SMB II Airport, Kertapati & TAA."
+                  : "Complimentary ferry terminal handover upon arrival."}
+              </span>
             </div>
           </div>
         </div>

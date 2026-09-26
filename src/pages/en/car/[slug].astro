@@ -3,6 +3,8 @@ import AppLayout from '../../../layouts/AppLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { formatIDR, estimateSGD, estimateMYR } from '../../../utils/currency';
 import { buildWhatsAppUrl } from '../../../utils/whatsapp';
+import { renderMarkdownToString } from '../../../utils/renderMarkdown';
+import AutoLinkContent from '../../../components/AutoLinkContent.astro';
 import { Users, Briefcase, Cog, CheckCircle2, ShieldCheck, MapPin, MessageCircle, ArrowLeft, ArrowRight, Clock } from '@lucide/astro';
 
 export async function getStaticPaths() {
@@ -22,6 +24,12 @@ const allLocations = await getCollection('lokasi');
 
 const hasSelfDrive = Boolean(d.priceDailySelfDrive);
 const minPrice = d.priceDailySelfDrive || d.priceDailyWithDriver;
+
+// English content (falls back to Indonesian when EN field is empty)
+const popularForEn = d.popularForEn || d.popularFor;
+const featuresEn = d.featuresEn || d.features;
+const categoryEn = d.categoryEn || d.category;
+const bodyEnHtml = d.bodyEn ? await renderMarkdownToString(d.bodyEn) : '';
 
 const waUrl = buildWhatsAppUrl({
   carModel: d.carModel,
@@ -73,7 +81,7 @@ const productSchema = {
       Rent {d.carModel} in Batam
     </h1>
     <p class="text-xs sm:text-sm text-slate-500 mt-1">
-      {d.popularFor} • 24-hour self-drive & chauffeur service
+      {popularForEn} • 24-hour self-drive & chauffeur service
     </p>
   </div>
 
@@ -111,14 +119,14 @@ const productSchema = {
       <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xs">
         <h2 class="text-lg font-black text-slate-900 mb-4">Vehicle Overview & Specifications</h2>
         <div class="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-600">
-          <Content />
+          {bodyEnHtml ? <AutoLinkContent lang="en" html={bodyEnHtml} /> : <Content />}
         </div>
       </div>
 
       <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xs">
         <h3 class="text-base font-black text-slate-900 mb-3">Vehicle Features & Comfort</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {d.features.map((ft) => (
+          {featuresEn.map((ft) => (
             <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
               <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
               <span>{ft}</span>
@@ -135,7 +143,7 @@ const productSchema = {
               <MapPin class="w-3.5 h-3.5 text-blue-600" />
               <span>Complimentary Delivery</span>
             </span>
-            <h2 class="text-lg font-black text-slate-900">Batam Pickup Hubs</h2>
+            <h2 class="text-lg font-black text-slate-900"><span class="city-name-dyn">Batam</span> Pickup Hubs</h2>
           </div>
           <a href="/en/lokasi" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>All Pickup Hubs</span>
@@ -147,8 +155,20 @@ const productSchema = {
           {allLocations.map((loc) => {
             const locSlug = loc.id.replace(/\.md$/, '');
             const locData = loc.data;
+            const locCity = locData.city || 'Batam';
+            const isDefaultBatam = locCity.toLowerCase() === 'batam';
+            const locHubType = locData.hubTypeEn || locData.hubType;
+            const locPickupTime = locData.pickupTimeEstimateEn || locData.pickupTimeEstimate;
+            const locAreaName = locData.areaNameEn || locData.areaName;
+            const locDesc = locData.descriptionEn || locData.description;
             return (
-              <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+              <div
+                class:list={[
+                  "pickup-hub-card bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group",
+                  !isDefaultBatam && "hidden"
+                ]}
+                data-city={locCity}
+              >
                 <div>
                   <a href={`/en/lokasi/${locSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
                     <img
@@ -158,20 +178,20 @@ const productSchema = {
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold shadow-xs">
-                      {locData.hubType}
+                      {locHubType}
                     </span>
                     <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500 text-white text-[10px] font-bold shadow-xs flex items-center gap-1">
                       <Clock class="w-2.5 h-2.5" />
-                      <span>{locData.pickupTimeEstimate}</span>
+                      <span>{locPickupTime}</span>
                     </span>
                   </a>
 
                   <div class="p-3.5">
                     <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
-                      <a href={`/en/lokasi/${locSlug}`}>{locData.areaName}</a>
+                      <a href={`/en/lokasi/${locSlug}`}>{locAreaName}</a>
                     </h3>
                     <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                      {locData.description}
+                      {locDesc}
                     </p>
                   </div>
                 </div>
@@ -240,20 +260,6 @@ const productSchema = {
           <span>Book via WhatsApp</span>
         </a>
 
-        <div class="mt-5 pt-4 border-t border-slate-100">
-          <span class="text-xs font-bold text-slate-700 block mb-2 flex items-center gap-1.5">
-            <MapPin class="w-3.5 h-3.5 text-blue-600" />
-            <span>Complimentary Ferry Handover:</span>
-          </span>
-          <div class="flex flex-wrap gap-1.5">
-            {d.pickupLocations.map((loc) => (
-              <span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                {loc}
-              </span>
-            ))}
-          </div>
-        </div>
-
         <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-1.5">
           <ShieldCheck class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <span>Vehicle is fully cleaned, sanitised, and inspected before handover.</span>
@@ -261,4 +267,42 @@ const productSchema = {
       </div>
     </div>
   </div>
+
+  <script is:inline>
+    function syncEnCarDetailCity(city) {
+      const isPalembang = city === 'palembang';
+
+      // Update H2 .city-name-dyn (... Pickup Hubs)
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = isPalembang ? 'Palembang' : 'Batam';
+      });
+
+      // Filter pickup hub cards by city
+      const cards = document.querySelectorAll('.pickup-hub-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initEnCarDetailCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncEnCarDetailCity(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncEnCarDetailCity(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initEnCarDetailCitySync);
+    document.addEventListener('astro:page-load', initEnCarDetailCitySync);
+  </script>
 </AppLayout>

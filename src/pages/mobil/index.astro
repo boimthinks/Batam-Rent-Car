@@ -3,6 +3,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
 import VehicleCard from '../../components/VehicleCard.astro';
 import HorizontalFilterChips from '../../components/HorizontalFilterChips.astro';
 import BottomSheetModal from '../../components/BottomSheetModal.astro';
+import PickupHubChips from '../../components/PickupHubChips.astro';
 import { getCollection } from 'astro:content';
 import { Car, ShieldCheck } from '@lucide/astro';
 
@@ -30,12 +31,15 @@ const sheetCars = sortedCars.map((c) => ({
       <span>Katalog Mobil Lincah Rent Car</span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Pilihan Mobil Rental di Batam
+      Pilihan Mobil Rental di <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="catalog-desc" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       Seluruh mobil terawat bersih, berkondisi prima, wangi, dan ber-AC dingin. Serah terima unit gratis langsung di Harbour Bay, Batam Centre Ferry Terminal, dan Bandara Hang Nadim.
     </p>
   </div>
+
+  <!-- Pickup Hubs dynamically synced with chosen city -->
+  <PickupHubChips lang="id" />
 
   <HorizontalFilterChips lang="id" />
 
@@ -67,7 +71,7 @@ const sheetCars = sortedCars.map((c) => ({
       </li>
       <li class="flex items-start gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
-        <span><strong>Gratis Antar Unit:</strong> Serah terima mobil di lobi terminal ferry atau bandara tepat waktu.</span>
+        <span id="guarantee-pickup"><strong>Gratis Antar Unit:</strong> Serah terima mobil di lobi terminal ferry atau bandara tepat waktu.</span>
       </li>
       <li class="flex items-start gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
@@ -77,4 +81,58 @@ const sheetCars = sortedCars.map((c) => ({
   </div>
 
   <BottomSheetModal cars={sheetCars} lang="id" />
+
+  <script is:inline>
+    function syncMobilPageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Update .city-name-dyn
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      // Update catalog description
+      const descEl = document.getElementById('catalog-desc');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Seluruh mobil terawat bersih, berkondisi prima, wangi, dan ber-AC dingin. Serah terima unit langsung di Bandara SMB II, Stasiun Kertapati, Pelabuhan Tanjung Api-Api, dan hotel seputaran Palembang.'
+          : 'Seluruh mobil terawat bersih, berkondisi prima, wangi, dan ber-AC dingin. Serah terima unit gratis langsung di Harbour Bay, Batam Centre Ferry Terminal, dan Bandara Hang Nadim.';
+      }
+
+      // Update guarantee pickup text
+      const pickupEl = document.getElementById('guarantee-pickup');
+      if (pickupEl) {
+        pickupEl.innerHTML = isPalembang
+          ? '<strong>Gratis Antar Unit:</strong> Serah terima mobil di Bandara SMB II, Stasiun Kertapati, atau hotel tepat waktu.'
+          : '<strong>Gratis Antar Unit:</strong> Serah terima mobil di lobi terminal ferry atau bandara tepat waktu.';
+      }
+
+      // Update vehicle card WhatsApp URLs
+      document.querySelectorAll('.btn-wa-card').forEach((btn) => {
+        const model = btn.getAttribute('data-car-model') || 'mobil';
+        const lang = btn.getAttribute('data-lang') || 'id';
+        const text = lang === 'en'
+          ? `Hi Lincah Rent Car, I would like to book ${model} in ${cityName}. Could you check availability?`
+          : `Halo Admin Lincah Rent Car, saya tertarik sewa mobil ${model} di ${cityName} untuk tanggal segera. Apakah unit tersedia?`;
+        btn.href = `https://wa.me/6281373703639?text=${encodeURIComponent(text)}`;
+      });
+    }
+
+    function initMobilCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncMobilPageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncMobilPageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initMobilCitySync);
+    document.addEventListener('astro:page-load', initMobilCitySync);
+  </script>
 </AppLayout>

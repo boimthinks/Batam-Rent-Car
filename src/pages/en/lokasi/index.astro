@@ -17,9 +17,9 @@ const locations = await getCollection('lokasi');
       <span>Complimentary Delivery Across Batam</span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Ferry & Airport Pickup Hubs in Batam
+      Ferry & Airport Pickup Hubs in <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="lokasi-desc-en" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       No need to search for rental offices or haggle with taxi drivers. Our team meets you right at the ferry arrival hall or airport exit with your reserved car ready to drive.
     </p>
   </div>
@@ -28,8 +28,16 @@ const locations = await getCollection('lokasi');
     {locations.map((loc) => {
       const slug = loc.id.replace(/\.md$/, '');
       const d = loc.data;
+      const city = d.city || 'Batam';
+      const isDefaultBatam = city.toLowerCase() === 'batam';
       return (
-        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+        <div
+          class:list={[
+            "loc-card bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group",
+            !isDefaultBatam && "hidden"
+          ]}
+          data-city={city}
+        >
           <div>
             <!-- 4:3 Location Image -->
             <a href={`/en/lokasi/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
@@ -83,4 +91,52 @@ const locations = await getCollection('lokasi');
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncEnLokasiPageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      document.title = isPalembang
+        ? 'Palembang Car Rental Pickup Hubs - SMB II Airport, Kertapati Station & TAA Port | Lincah Rent Car Batam'
+        : 'Batam Car Rental Pickup Hubs - Ferry Terminals & Airport Handover | Lincah Rent Car Batam';
+
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      const descEl = document.getElementById('lokasi-desc-en');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Direct vehicle handover across Palembang: Sultan Mahmud Badaruddin II Airport, Kertapati Station, Tanjung Api-Api Port, and city hotels.'
+          : 'No need to search for rental offices or haggle with taxi drivers. Our team meets you right at the ferry arrival hall or airport exit with your reserved car ready to drive.';
+      }
+
+      const cards = document.querySelectorAll('.loc-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initEnLokasiCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncEnLokasiPageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncEnLokasiPageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initEnLokasiCitySync);
+    document.addEventListener('astro:page-load', initEnLokasiCitySync);
+  </script>
 </AppLayout>

@@ -9,17 +9,17 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
 
 <AppLayout
   title="Blog & Panduan Rental Mobil Batam"
-  description="Artikel edukasi seputar rute wisata Jembatan Barelang, panduan pelabuhan Batam Centre vs Harbour Bay, tips sewa lepas kunci, dan kuliner Batam."
+  description="Artikel edukasi seputar rute wisata, panduan titik jemput bandara & pelabuhan, tips sewa lepas kunci, dan rekomendasi perjalanan."
 >
   <div class="mb-6">
     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
       <BookOpen class="w-3.5 h-3.5" />
-      <span>Edukasi & Panduan Wisata Batam</span>
+      <span>Edukasi & Panduan Wisata <span class="city-name-dyn">Batam</span></span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Blog & Informasi Terkini
+      Blog & Informasi Terkini <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="blog-desc" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       Kumpulan artikel panduan perjalanan, perbandingan titik jemput pelabuhan, estimasi biaya sewa mobil, dan syarat lepas kunci di Batam.
     </p>
   </div>
@@ -28,8 +28,16 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
     {sortedPosts.map((post) => {
       const slug = post.id.replace(/\.md$/, '');
       const d = post.data;
+      const city = d.city || 'Batam';
+      const isDefaultBatam = city.toLowerCase() === 'batam';
       return (
-        <article class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all">
+        <article
+          class:list={[
+            "blog-card bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all",
+            !isDefaultBatam && "hidden"
+          ]}
+          data-city={city}
+        >
           <div>
             <a href={`/blog/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
               <img
@@ -40,9 +48,14 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
               />
             </a>
             <div class="p-5">
-              <div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 mb-2">
-                <Calendar class="w-3.5 h-3.5" />
-                <span>{d.pubDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <div class="flex items-center justify-between gap-2 text-[11px] font-bold text-slate-400 mb-2">
+                <span class="flex items-center gap-1.5">
+                  <Calendar class="w-3.5 h-3.5 text-blue-600" />
+                  <span>{d.pubDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100">
+                  {city}
+                </span>
               </div>
 
               <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
@@ -68,4 +81,56 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncBlogPageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Update document.title
+      document.title = isPalembang
+        ? 'Blog & Panduan Rental Mobil Palembang | Lincah Rent Car'
+        : 'Blog & Panduan Rental Mobil Batam | Lincah Rent Car';
+
+      // Update .city-name-dyn
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      // Update description
+      const descEl = document.getElementById('blog-desc');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Kumpulan artikel panduan perjalanan, tips rute Bandara SMB II, wisata kuliner pempek, estimasi biaya sewa mobil, dan syarat lepas kunci di Palembang.'
+          : 'Kumpulan artikel panduan perjalanan, perbandingan titik jemput pelabuhan, estimasi biaya sewa mobil, dan syarat lepas kunci di Batam.';
+      }
+
+      // Filter blog card articles by city
+      const cards = document.querySelectorAll('.blog-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initBlogCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncBlogPageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncBlogPageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initBlogCitySync);
+    document.addEventListener('astro:page-load', initBlogCitySync);
+  </script>
 </AppLayout>

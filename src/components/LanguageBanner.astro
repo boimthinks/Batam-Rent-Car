@@ -1,9 +1,10 @@
 ---
 interface Props {
   currentLang?: 'id' | 'en';
+  alternateUrl?: string;
 }
 
-const { currentLang = 'id' } = Astro.props;
+const { currentLang = 'id', alternateUrl = '/en' } = Astro.props;
 ---
 
 <aside
@@ -21,7 +22,7 @@ const { currentLang = 'id' } = Astro.props;
     <div class="flex items-center gap-2 shrink-0">
       <a
         id="lang-banner-cta"
-        href="/en"
+        href={alternateUrl}
         class="bg-white text-blue-900 hover:bg-blue-50 font-bold px-3 py-1 rounded-lg text-xs transition-colors shadow-xs"
       >
         Switch to English
@@ -44,15 +45,26 @@ const { currentLang = 'id' } = Astro.props;
       const dismissed = localStorage.getItem('lincah_lang_dismissed');
       if (dismissed) return;
 
+      // If user has already explicitly chosen 'id', respect their choice
+      const explicitLang = localStorage.getItem('lincah_lang');
+      if (explicitLang === 'id') return;
+
       const userLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
       const banner = document.getElementById('lang-banner');
       const closeBtn = document.getElementById('lang-banner-close');
+      const ctaBtn = document.getElementById('lang-banner-cta');
 
       if (!banner) return;
 
       // If user is on ID page but browser language starts with 'en'
       if (currentLang === 'id' && userLang.startsWith('en')) {
         banner.classList.remove('hidden');
+      }
+
+      if (ctaBtn) {
+        ctaBtn.addEventListener('click', () => {
+          localStorage.setItem('lincah_lang', 'en');
+        });
       }
 
       if (closeBtn) {

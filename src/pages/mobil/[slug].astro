@@ -19,6 +19,7 @@ const slug = car.id.replace(/\.md$/, '');
 const d = car.data;
 
 const allLocations = await getCollection('lokasi');
+const allServices = await getCollection('layanan');
 
 const hasSelfDrive = Boolean(d.priceDailySelfDrive);
 const minPrice = d.priceDailySelfDrive || d.priceDailyWithDriver;
@@ -133,6 +134,66 @@ const productSchema = {
         </div>
       </div>
 
+      <!-- Cardview Layanan -->
+      <div class="space-y-4 pt-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold mb-1">
+              <ShieldCheck class="w-3.5 h-3.5 text-blue-600" />
+              <span>Pilihan Layanan</span>
+            </span>
+            <h2 class="text-lg font-black text-slate-900">Layanan Tersedia untuk {d.carModel}</h2>
+          </div>
+          <a href="/layanan" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+            <span>Semua Layanan</span>
+            <ArrowRight class="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {allServices.map((srv) => {
+            const srvSlug = srv.id.replace(/\.md$/, '');
+            const srvData = srv.data;
+            return (
+              <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+                <div>
+                  <a href={`/layanan/${srvSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+                    <img
+                      src={srvData.image}
+                      alt={srvData.title}
+                      loading="lazy"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold shadow-xs">
+                      {srvData.badge || 'Layanan'}
+                    </span>
+                  </a>
+
+                  <div class="p-3.5">
+                    <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
+                      <a href={`/layanan/${srvSlug}`}>{srvData.title}</a>
+                    </h3>
+                    <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      {srvData.shortDesc}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-3.5 pt-0">
+                  <a
+                    href={`/layanan/${srvSlug}`}
+                    class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600 group-hover:text-blue-700"
+                  >
+                    <span>Pelajari Detail</span>
+                    <ArrowRight class="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <!-- Cardview Titik Jemput Mobil -->
       <div class="space-y-4 pt-4">
         <div class="flex items-center justify-between">
@@ -141,7 +202,7 @@ const productSchema = {
               <MapPin class="w-3.5 h-3.5 text-blue-600" />
               <span>Antar-Jemput Gratis</span>
             </span>
-            <h2 class="text-lg font-black text-slate-900">Titik Jemput di Batam</h2>
+            <h2 class="text-lg font-black text-slate-900">Titik Jemput di <span class="city-name-dyn">Batam</span></h2>
           </div>
           <a href="/lokasi" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>Semua Titik Jemput</span>
@@ -153,8 +214,16 @@ const productSchema = {
           {allLocations.map((loc) => {
             const locSlug = loc.id.replace(/\.md$/, '');
             const locData = loc.data;
+            const locCity = locData.city || 'Batam';
+            const isDefaultBatam = locCity.toLowerCase() === 'batam';
             return (
-              <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+              <div
+                class:list={[
+                  "pickup-hub-card bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group",
+                  !isDefaultBatam && "hidden"
+                ]}
+                data-city={locCity}
+              >
                 <div>
                   <a href={`/lokasi/${locSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
                     <img
@@ -248,21 +317,6 @@ const productSchema = {
           <span>Booking Unit via WhatsApp</span>
         </a>
 
-        <!-- Pickup Locations List -->
-        <div class="mt-5 pt-4 border-t border-slate-100">
-          <span class="text-xs font-bold text-slate-700 block mb-2 flex items-center gap-1.5">
-            <MapPin class="w-3.5 h-3.5 text-blue-600" />
-            <span>Titik Serah Terima Gratis:</span>
-          </span>
-          <div class="flex flex-wrap gap-1.5">
-            {d.pickupLocations.map((loc) => (
-              <span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                {loc}
-              </span>
-            ))}
-          </div>
-        </div>
-
         <!-- Guarantee Note -->
         <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-1.5">
           <ShieldCheck class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -271,4 +325,41 @@ const productSchema = {
       </div>
     </div>
   </div>
+  <script is:inline>
+    function syncMobilDetailCity(city) {
+      const isPalembang = city === 'palembang';
+
+      // Update H2 .city-name-dyn (Titik Jemput di ...)
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = isPalembang ? 'Palembang' : 'Batam';
+      });
+
+      // Filter pickup hub cards by city
+      const cards = document.querySelectorAll('.pickup-hub-card');
+      cards.forEach((card) => {
+        const cardCity = (card.getAttribute('data-city') || 'Batam').toLowerCase();
+        if (cardCity === city.toLowerCase()) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function initMobilDetailCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncMobilDetailCity(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncMobilDetailCity(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initMobilDetailCitySync);
+    document.addEventListener('astro:page-load', initMobilDetailCitySync);
+  </script>
 </AppLayout>

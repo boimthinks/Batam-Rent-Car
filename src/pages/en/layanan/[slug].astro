@@ -2,6 +2,8 @@
 import AppLayout from '../../../layouts/AppLayout.astro';
 import VehicleCard from '../../../components/VehicleCard.astro';
 import BottomSheetModal from '../../../components/BottomSheetModal.astro';
+import AutoLinkContent from '../../../components/AutoLinkContent.astro';
+import { renderMarkdownToString } from '../../../utils/renderMarkdown';
 import { getCollection, render } from 'astro:content';
 import { CheckCircle2, MessageCircle, ArrowLeft, ShieldCheck, Flame, ArrowRight } from '@lucide/astro';
 
@@ -51,7 +53,12 @@ const enServiceTitles: Record<string, { title: string; desc: string }> = {
 };
 
 const slug = srv.id.replace(/\.md$/, '');
-const trans = enServiceTitles[slug] || { title: d.title, desc: d.shortDesc };
+const trans = enServiceTitles[slug] || { title: d.title, desc: d.shortDescEn || d.shortDesc };
+
+// English content (falls back to Indonesian when EN field is empty)
+const badgeEn = d.badgeEn || d.badge || 'Service';
+const featuresEn = d.featuresEn || d.features;
+const bodyEnHtml = d.bodyEn ? await renderMarkdownToString(d.bodyEn) : '';
 
 const waText = `Hi Lincah Rent Car, I would like to inquire about ${trans.title} in Batam.`;
 const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
@@ -79,7 +86,7 @@ const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
           class="w-full h-full object-cover"
         />
         <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold shadow-xs">
-          {d.badge || 'Service'}
+          {badgeEn}
         </span>
       </div>
 
@@ -92,7 +99,7 @@ const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
         </p>
 
         <div class="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700">
-          <Content />
+          {bodyEnHtml ? <AutoLinkContent lang="en" html={bodyEnHtml} /> : <Content />}
         </div>
       </div>
 
@@ -100,7 +107,7 @@ const waUrl = `https://wa.me/6281373703639?text=${encodeURIComponent(waText)}`;
       <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs">
         <h2 class="text-base font-black text-slate-900 mb-3">Service Benefits</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {d.features.map((f) => (
+          {featuresEn.map((f) => (
             <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
               <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
               <span>{f}</span>

@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 50" width="260" height="50">
-  <rect x="0" y="5" width="40" height="40" rx="10" fill="#1447E6"/>
-  <!-- Car icon in logo -->
-  <path d="M8 28 L14 18 L26 18 L32 28 Z" fill="#FFFFFF"/>
-  <circle cx="14" cy="31" r="3" fill="#1447E6"/>
-  <circle cx="26" cy="31" r="3" fill="#1447E6"/>
-  <text x="50" y="28" fill="#1E293B" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800">LINCAH</text>
-  <text x="145" y="28" fill="#1447E6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800">RENT</text>
-  <text x="50" y="42" fill="#64748B" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CAR BATAM</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 56" width="280" height="56">
+  <!-- Original Lincah Rent Car Brand Icon -->
+  <svg x="2" y="4" width="48" height="48" viewBox="0 0 513 512">
+    <path fill-rule="evenodd" fill="#1447E6" d="M84.911,0.000 L429.089,0.000 C475.432,0.000 512.1000,37.568 512.1000,83.911 L512.1000,428.089 C512.1000,474.432 475.432,511.1000 429.089,511.1000 L84.911,511.1000 C38.568,511.1000 1.000,474.432 1.000,428.089 L1.000,83.911 C1.000,37.568 38.568,0.000 84.911,0.000 Z"/>
+    <path fill-rule="evenodd" fill="#FFFFFF" d="M447.263,256.242 C421.875,342.251 316.351,411.975 211.570,411.975 C129.379,411.975 72.074,369.069 63.433,309.059 L0.526,309.059 L0.526,300.365 L244.792,300.365 L268.125,211.490 L212.111,211.490 L201.839,250.614 L69.614,250.614 C74.202,237.059 80.775,223.947 88.1000,211.490 L0.526,211.490 L0.526,202.795 L214.393,202.795 L270.408,202.795 L283.469,153.045 L145.936,153.045 C190.202,120.826 246.959,100.509 303.510,100.509 C408.291,100.509 472.652,170.233 447.263,256.242 ZM186.495,309.059 L173.433,358.810 L326.929,358.810 L341.120,309.059 L186.495,309.059 Z"/>
+  </svg>
+
+  <!-- Typography matching Plus Jakarta Sans -->
+  <text x="60" y="31" fill="#0F172A" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="22" font-weight="900" letter-spacing="-0.5">LINCAH<tspan fill="#1447E6">RENT</tspan></text>
+  <text x="61" y="47" fill="#64748B" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="700" letter-spacing="1.5">BATAM CAR RENTAL</text>
 </svg>

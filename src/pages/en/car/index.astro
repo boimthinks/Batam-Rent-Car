@@ -3,6 +3,7 @@ import AppLayout from '../../../layouts/AppLayout.astro';
 import VehicleCard from '../../../components/VehicleCard.astro';
 import HorizontalFilterChips from '../../../components/HorizontalFilterChips.astro';
 import BottomSheetModal from '../../../components/BottomSheetModal.astro';
+import PickupHubChips from '../../../components/PickupHubChips.astro';
 import { getCollection } from 'astro:content';
 import { Car, ShieldCheck } from '@lucide/astro';
 
@@ -31,12 +32,14 @@ const sheetCars = sortedCars.map((c) => ({
       <span>Lincah Rent Car Catalog</span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Available Rental Cars in Batam
+      Available Rental Cars in <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="catalog-desc-en" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       All vehicles are fully air-conditioned, sanitised, and serviced regularly. Complimentary handover at Harbour Bay, Batam Centre Ferry Terminal, and Hang Nadim Airport.
     </p>
   </div>
+
+  <PickupHubChips lang="en" />
 
   <HorizontalFilterChips lang="en" />
 
@@ -64,7 +67,7 @@ const sheetCars = sortedCars.map((c) => ({
       </li>
       <li class="flex items-start gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
-        <span><strong>Direct Terminal Handover:</strong> Meet our driver right at Harbour Bay or Batam Centre arrival hall.</span>
+        <span id="guarantee-pickup-en"><strong>Direct Terminal Handover:</strong> Meet our driver right at Harbour Bay or Batam Centre arrival hall.</span>
       </li>
       <li class="flex items-start gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
@@ -78,4 +81,50 @@ const sheetCars = sortedCars.map((c) => ({
   </div>
 
   <BottomSheetModal cars={sheetCars} lang="en" />
+
+  <script is:inline>
+    function syncEnCarPageTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      const descEl = document.getElementById('catalog-desc-en');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'All vehicles are fully air-conditioned, sanitised, and serviced regularly. Free handover at Sultan Mahmud Badaruddin II (SMB II) Airport, Kertapati Station, and central hotels.'
+          : 'All vehicles are fully air-conditioned, sanitised, and serviced regularly. Complimentary handover at Harbour Bay, Batam Centre Ferry Terminal, and Hang Nadim Airport.';
+      }
+
+      const pickupEl = document.getElementById('guarantee-pickup-en');
+      if (pickupEl) {
+        pickupEl.innerHTML = isPalembang
+          ? '<strong>Direct Arrival Handover:</strong> Meet our team directly at SMB II Airport arrival hall or Kertapati Station.'
+          : '<strong>Direct Terminal Handover:</strong> Meet our driver right at Harbour Bay or Batam Centre arrival hall.';
+      }
+
+      document.querySelectorAll('.btn-wa-card').forEach((btn) => {
+        const model = btn.getAttribute('data-car-model') || 'a vehicle';
+        btn.href = `https://wa.me/6281373703639?text=${encodeURIComponent(`Hi Lincah Rent Car, I would like to book ${model} in ${cityName}. Could you check availability?`)}`;
+      });
+    }
+
+    function initEnCarCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncEnCarPageTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncEnCarPageTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initEnCarCitySync);
+    document.addEventListener('astro:page-load', initEnCarCitySync);
+  </script>
 </AppLayout>

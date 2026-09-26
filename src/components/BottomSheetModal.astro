@@ -221,9 +221,15 @@ const isEn = lang === 'en';
 
       // Links
       detailLinkEl.href = isEn ? `/en/car/${slug}` : `/mobil/${slug}`;
+      let cityDisplay = 'Batam';
+      try {
+        const saved = localStorage.getItem('lincah_city');
+        if (saved === 'palembang') cityDisplay = 'Palembang';
+      } catch (e) {}
+
       const msg = isEn
-        ? `Hi Lincah Rent Car, I would like to book ${d.carModel}. Could you check availability?`
-        : `Halo Admin Lincah Rent Car, saya tertarik sewa mobil ${d.carModel} di Batam. Apakah unit tersedia?`;
+        ? `Hi Lincah Rent Car, I would like to book ${d.carModel} in ${cityDisplay}. Could you check availability?`
+        : `Halo Admin Lincah Rent Car, saya tertarik sewa mobil ${d.carModel} di ${cityDisplay}. Apakah unit tersedia?`;
       waBtnEl.href = `https://wa.me/6281373703639?text=${encodeURIComponent(msg)}`;
 
       // Show sheet

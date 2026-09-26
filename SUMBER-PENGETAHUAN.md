@@ -12,8 +12,9 @@ File ini adalah **sumber kebenaran tunggal** untuk seluruh informasi faktual Lin
 | **Website** | lincahrentcar.com |
 | **Tagline** | "Sewa Mobil Cepat, Nyaman, & Fleksibel di Batam" |
 | **WhatsApp CS** | `+6281373703639` (`6281373703639`) |
-| **Alamat Kantor** | Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai - Batam, Kepri 29431 |
-| **Area Operasional** | Seluruh Pulau Batam (Batam Centre, Harbour Bay, Hang Nadim Airport, Sekupang, Batu Ampar, Nongsa, Barelang) |
+| **Alamat Kantor Batam** | Jln. Jend Sudirman Komp. Ruko Mega Legenda 2 Blok B2 No.7 Baloi Permai - Batam, Kepri 29431 |
+| **Alamat Kantor Palembang** | Lorong Tj. Burung Utama, Bukit Lama, Kec. Ilir Bar. I, Kota Palembang, Sumatera Selatan 30139 |
+| **Area Operasional** | Pulau Batam (Kepulauan Riau) & Kota Palembang (Sumatera Selatan) |
 | **Jam Buka** | 24 Jam Setiap Hari (Layanan antar-jemput pelabuhan & bandara standby) |
 
 ---
@@ -73,6 +74,21 @@ File ini adalah **sumber kebenaran tunggal** untuk seluruh informasi faktual Lin
 
 ---
 
+## 4B. Titik Jemput Strategis di Palembang (Hub Sumatera Selatan)
+
+| Titik Jemput | Kategori Hub | Estimasi Penyerahan Unit | Biaya Antar (Delivery Fee) | Keterangan Landmark |
+|---|---|---|---|---|
+| **Bandara Sultan Mahmud Badaruddin II (SMB II)** | Airport | 15 - 20 menit | Gratis | Lobi Kedatangan Domestik & Stasiun LRT Bandara |
+| **Pelabuhan Tanjung Api-Api (TAA)** | Port | Sesuai Jadwal Kapal | Rp 150.000 | Dermaga Penyeberangan Ferry Ro-Ro Bangka Muntok |
+| **Stasiun Kertapati & Koridor LRT** | Train Station | 15 - 25 menit | Gratis | Pintu keluar Stasiun Kereta Api Kertapati & Halte LRT |
+| **Pusat Kota & Jl. Jend. Sudirman** | City Center | 15 - 20 menit | Gratis | Mall Palembang Icon, Aryaduta, Masjid Agung |
+| **R. Sukamto & PTC Mall** | City Center | 15 - 20 menit | Gratis | Dekat Hotel Novotel, Harper, Kenten |
+| **Jakabaring Sport City (JSC)** | City Center | 15 - 25 menit | Gratis | Stadion Gelora Sriwijaya, OPI Mall, Hotel Wyndham |
+
+*Navigasi Multi-Kota*: Pengunjung dapat berpindah kota (Batam / Palembang) melalui City Switcher di navbar. Seluruh halaman utama (`/`, `/mobil`, `/layanan`, `/lokasi`) otomatis beradaptasi secara dinamis sesuai kota yang dipilih.
+
+---
+
 ## 5. Syarat & Ketentuan Sewa Lepas Kunci
 
 ### Wisatawan Domestik / Luar Batam:
@@ -96,3 +112,85 @@ File ini adalah **sumber kebenaran tunggal** untuk seluruh informasi faktual Lin
    `Halo Admin Lincah Rent Car, saya butuh penjemputan mobil di [Bandara Hang Nadim / Harbour Bay / Batam Centre] untuk tanggal [Tanggal]. Mohon infonya.`
 3. **Versi Bahasa Inggris (`/en/`)**:
    `Hi Lincah Rent Car, I would like to book [Car Model] for [Rental Dates]. Pickup point: [Harbour Bay / Batam Centre / Airport]. Could you check the availability?`
+
+---
+
+## 7. Mekanisme Penulisan Artikel Blog (Matriks 3 Pilar, Bilingual, & Multi-Kota)
+
+Blog Lincah Rent Car menggunakan arsitektur konten terstruktur berbasis **kombinasi 3 pilar** dengan sistem tautan otomatis (*auto-linking*) dan sinkronisasi multibahasa (ID/EN) serta multi-kota (Batam/Palembang).
+
+### A. Formula Topik 3 Pilar
+Setiap artikel memadukan tiga entitas inti untuk menangkap kebutuhan pencarian spesifik (*high-intent long-tail*):
+$$\text{Formula: } [\text{Unit Armada}] + [\text{Jenis Layanan}] + [\text{Titik Jemput / Kawasan Kota}]$$
+
+*Contoh kombinasi:*
+- **Batam**: Toyota Innova Reborn + Dengan Supir + Kawasan Industri Batamindo Batu Aji (Kunjungan kerja/audit pabrik).
+- **Palembang**: Toyota Avanza + Lepas Kunci + Bandara SMB II Palembang (Perjalanan dinas & wisata kuliner).
+- **Batam**: Toyota Hiace Commuter + Dengan Supir + Bandara Hang Nadim / Nongsa (Rombongan group tour / event).
+- **Palembang**: Toyota Innova Reborn + Dengan Supir + Pelabuhan Tanjung Api-Api (Penjemputan ferry Bangka).
+
+### B. Aturan Wajib Pasangan Bilingual (ID & EN)
+Setiap artikel wajib diproduksi berpasangan dalam satu waktu:
+1. **Versi Indonesia**:
+   - `lang: "id"`
+   - Folder: `src/content/blog/[slug-id].md`
+   - URL publik: `/blog/[slug-id]`
+2. **Versi English**:
+   - `lang: "en"`
+   - Folder: `src/content/blog/[slug-en].md`
+   - URL publik: `/en/guide/[slug-en]`
+3. **Koneksi `alternateSlug`**:
+   - Artikel ID wajib menyertakan `alternateSlug: "[slug-en]"` di frontmatter.
+   - Artikel EN wajib menyertakan `alternateSlug: "[slug-id]"` di frontmatter.
+   - Ini memastikan tombol switcher ID/EN pada header navigasi langsung berpindah ke artikel yang tepat, serta menjaga validitas SEO hreflang internasional.
+4. **Field `city` (Wajib)**:
+   - Frontmatter wajib memuat `city: "Batam"` atau `city: "Palembang"`.
+   - Ini digunakan untuk filter otomatis pada cardview di homepage dan arsip blog.
+
+### C. Sistem Auto-Linking Otomatis (Tanpa Link Manual di Markdown)
+Penulis **tidak perlu** mengetik tautan markdown manual untuk armada, layanan, atau lokasi:
+- Komponen `AutoLinkContent.astro` dan kamus kata kunci di `src/data/autolinks.ts` memproses teks secara otomatis saat build (SSG).
+- Penulis cukup menyebutkan nama entitas secara natural (misal: "Toyota Innova Reborn", "dengan supir", "Batamindo", "Bandara SMB II", "PTC Mall").
+- **Proteksi SEO**:
+  - Hanya menautkan **kemunculan pertama** dari setiap entitas per artikel (mencegah link spam).
+  - Mengutamakan frasa terpanjang (*longest-match first*).
+  - Kebal dari tag heading (`<h2>`, `<h3>`), tautan yang sudah ada, atau blok kode.
+  - Bahasa ID otomatis mengarah ke `/mobil/...`, `/layanan/...`, `/lokasi/...`.
+  - Bahasa EN otomatis mengarah ke `/en/car/...`, `/en/layanan/...`, `/en/lokasi/...`.
+
+### D. Standar Penulisan & Humanizer (Skill `penulis-ahli`)
+- **Tone**: Hangat, informatif, berorientasi solusi lapangan, tanpa gaya bahasa iklan hiperbolis.
+- **Larangan**: Tanpa em dash (—), tanpa emoji, tanpa pembuka klise ("Dalam era...", "Dalam dunia..."), dan hindari paragraf panjang (maksimal 2-4 kalimat per paragraf).
+- **Akurasi Data**: Seluruh tarif, durasi jemput, dan spesifikasi unit wajib merujuk ke tabel Bagian 3, 4, dan 4B di file ini.
+
+---
+
+## 8. Daftar Artikel Blog Terbit
+
+| No | Judul Artikel | Bahasa | URL | Topik Utama (3 Pilar) | Tanggal |
+|---|---|---|---|---|---|
+| 1 | Rental Mobil Innova Reborn dengan Supir Jemput di Batamindo Batu Aji Batam | ID | `/blog/rental-mobil-innova-reborn-dengan-supir-jemput-batamindo-batu-aji` | Innova Reborn + Dengan Supir + Batamindo Batu Aji | 2026-09-25 |
+| 2 | Innova Reborn Car Rental with Driver to Batamindo Industrial Park Batu Aji: Reliable Corporate Travel in Batam | EN | `/en/guide/innova-reborn-car-rental-with-driver-batamindo-batu-aji` | Innova Reborn + With Driver + Batamindo Batu Aji | 2026-09-25 |
+| 3 | Rental Mobil Avanza Lepas Kunci Jemput di Bandara SMB II Palembang | ID | `/blog/rental-mobil-avanza-lepas-kunci-jemput-bandara-smb-2-palembang` | Avanza + Lepas Kunci + Bandara SMB II Palembang | 2026-09-25 |
+| 4 | Toyota Avanza Self-Drive Car Rental at SMB II Airport Palembang | EN | `/en/guide/toyota-avanza-self-drive-car-rental-smb-2-airport-palembang` | Avanza + Self-Drive + SMB II Airport Palembang | 2026-09-25 |
+
+---
+
+## 9. Panduan Teknis Arsitektur Multi-Kota (Batam & Palembang) & Preferensi Bahasa
+
+Website dirancang melayani dua kota tanpa perlu duplikasi struktur halaman atau subdomain terpisah:
+1. **State Klien**:
+   - Kota: Disimpan di `localStorage.getItem('lincah_city')` dengan nilai `'batam'` (default) atau `'palembang'`.
+   - Bahasa: Disimpan di `localStorage.getItem('lincah_lang')` dengan nilai `'id'` atau `'en'` untuk mengingat preferensi pengunjung dan mencegah banner rekomendasi bahasa mengganggu pengguna yang memilih bahasa Indonesia.
+2. **Event Global**: Saat kota diganti di `StickyTopBar.astro`, event `window.dispatchEvent(new CustomEvent('cityChange', { detail: { city } }))` ditembakkan.
+3. **Reaktivitas Halaman**:
+   - `src/pages/index.astro` & `src/pages/en/index.astro`: Memperbarui Hero title, badge, deskripsi, link WA, chip titik jemput, filter kartu artikel blog, dan accordion FAQ.
+   - `src/pages/mobil/index.astro` & `src/pages/en/car/index.astro`: Memperbarui H1, deskripsi, chip titik jemput, jaminan antar unit, dan URL WA pada setiap kartu mobil.
+   - `src/pages/layanan/index.astro` & `src/pages/en/layanan/index.astro`: Memperbarui `document.title`, H1, dan deskripsi solusi transportasi.
+   - `src/pages/lokasi/index.astro` & `src/pages/en/lokasi/index.astro`: Menyaring kartu lokasi (9 hub Batam vs 6 hub Palembang) serta memperbarui teks pengantar.
+   - `src/pages/blog/index.astro` & `src/pages/en/guide/index.astro`: Menyaring kartu artikel blog sesuai kota aktif.
+   - `StickyTopBar.astro` & `AppLayout.astro`: Memperbarui subtitle brand (*"Batam Car Rental"* / *"Palembang Car Rental"*), logo SVG, daftar titik jemput footer, dan badge aktif pada alamat kantor.
+4. **Header Mobile**:
+   - Pada layar mobile (`md:hidden`), bar navigasi atas hanya menampilkan logo dan tombol Hamburger (☰).
+   - Seluruh kontrol pemilihan kota (Batam/Palembang) dan switcher bahasa (ID/EN) berada di dalam drawer mobile slide-over.
+

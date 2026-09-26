@@ -39,9 +39,9 @@ const enServiceTitles: Record<string, { title: string; desc: string }> = {
       Lincah Rent Car Services
     </span>
     <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-      Flexible Island Transportation Services
+      Flexible Transportation Services in <span class="city-name-dyn">Batam</span>
     </h1>
-    <p class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+    <p id="layanan-desc-en" class="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
       Choose the most convenient rental package for your trip: self-drive flexibility, experienced private chauffeurs, or direct ferry terminal transfers.
     </p>
   </div>
@@ -100,4 +100,42 @@ const enServiceTitles: Record<string, { title: string; desc: string }> = {
       );
     })}
   </div>
+
+  <script is:inline>
+    function syncEnLayananTexts(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      document.title = isPalembang
+        ? 'Palembang Car Rental Services - Self-Drive, Chauffeur & Airport Transfers | Lincah Rent Car Batam'
+        : 'Batam Car Rental Services - Self-Drive, Chauffeur & Ferry Transfers | Lincah Rent Car Batam';
+
+      document.querySelectorAll('.city-name-dyn').forEach((el) => {
+        el.textContent = cityName;
+      });
+
+      const descEl = document.getElementById('layanan-desc-en');
+      if (descEl) {
+        descEl.textContent = isPalembang
+          ? 'Choose the most convenient rental package for your trip in Palembang: self-drive flexibility, experienced private chauffeurs, or direct SMB II airport transfers.'
+          : 'Choose the most convenient rental package for your trip: self-drive flexibility, experienced private chauffeurs, or direct ferry terminal transfers.';
+      }
+    }
+
+    function initEnLayananCitySync() {
+      try {
+        const savedCity = localStorage.getItem('lincah_city') || 'batam';
+        syncEnLayananTexts(savedCity);
+      } catch (e) {}
+    }
+
+    window.addEventListener('cityChange', (e) => {
+      if (e.detail && e.detail.city) {
+        syncEnLayananTexts(e.detail.city);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initEnLayananCitySync);
+    document.addEventListener('astro:page-load', initEnLayananCitySync);
+  </script>
 </AppLayout>

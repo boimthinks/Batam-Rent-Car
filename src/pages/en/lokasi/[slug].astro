@@ -2,7 +2,10 @@
 import AppLayout from '../../../layouts/AppLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { buildWhatsAppUrl } from '../../../utils/whatsapp';
-import { MapPin, Clock, ShieldCheck, CheckCircle2, MessageCircle, ArrowLeft } from '@lucide/astro';
+import { renderMarkdownToString } from '../../../utils/renderMarkdown';
+import AutoLinkContent from '../../../components/AutoLinkContent.astro';
+import VehicleCard from '../../../components/VehicleCard.astro';
+import { MapPin, Clock, ShieldCheck, CheckCircle2, MessageCircle, ArrowLeft, ArrowRight, Flame } from '@lucide/astro';
 
 export async function getStaticPaths() {
   const locations = await getCollection('lokasi');
@@ -16,15 +19,26 @@ const { loc } = Astro.props;
 const { Content } = await render(loc);
 const d = loc.data;
 
+// English content (falls back to Indonesian when EN field is empty)
+const areaNameEn = d.areaNameEn || d.areaName;
+const hubTypeEn = d.hubTypeEn || d.hubType;
+const descriptionEn = d.descriptionEn || d.description || '';
+const landmarkKeyEn = d.landmarkKeyEn || d.landmarkKey;
+const pickupTimeEn = d.pickupTimeEstimateEn || d.pickupTimeEstimate;
+const bodyEnHtml = d.bodyEn ? await renderMarkdownToString(d.bodyEn) : '';
+
 const waUrl = buildWhatsAppUrl({
-  pickupLocation: d.areaName,
+  pickupLocation: d.areaNameEn || d.areaName,
   lang: 'en',
 });
+
+const allCars = await getCollection('mobil');
+const popularCars = allCars.filter((car) => car.data.featured);
 ---
 
 <AppLayout
-  title={`Car Rental Pickup at ${d.areaName} Batam - Ferry & Airport Handover`}
-  description={`Book car rental with direct delivery to ${d.areaName} Batam. Estimated handover ${d.pickupTimeEstimate}. Free terminal delivery at Harbour Bay, Batam Centre & Airport.`}
+  title={`Car Rental Pickup at ${areaNameEn} Batam - Ferry & Airport Handover`}
+  description={`Book car rental with direct delivery to ${areaNameEn} Batam. Estimated handover ${pickupTimeEn}. Free terminal delivery at Harbour Bay, Batam Centre & Airport.`}
   lang="en"
 >
   <div class="mb-4">
@@ -44,25 +58,25 @@ const waUrl = buildWhatsAppUrl({
           class="w-full h-full object-cover"
         />
         <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold shadow-xs">
-          {d.hubType}
+          {hubTypeEn}
         </span>
         <span class="absolute top-4 right-4 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold shadow-xs flex items-center gap-1">
           <Clock class="w-3.5 h-3.5" />
-          <span>Handover Time: {d.pickupTimeEstimate}</span>
+          <span>Handover Time: {pickupTimeEn}</span>
         </span>
       </div>
 
       <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs">
         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-3 tracking-tight">
-          Car Rental Handover at {d.areaName}
+          Car Rental Handover at {areaNameEn}
         </h1>
 
         <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-          {d.description || `Seamless car delivery directly to ${d.areaName}, Batam. Free service for ferry passengers and flight arrivals.`}
+          {descriptionEn || `Seamless car delivery directly to ${areaNameEn}, Batam. Free service for ferry passengers and flight arrivals.`}
         </p>
 
         <div class="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed text-slate-700">
-          <Content />
+          {bodyEnHtml ? <AutoLinkContent lang="en" html={bodyEnHtml} /> : <Content />}
         </div>
       </div>
 
@@ -70,11 +84,39 @@ const waUrl = buildWhatsAppUrl({
       <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs">
         <h2 class="text-base font-black text-slate-900 mb-3">Key Landmarks & Meeting Spots</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {d.landmarkKey.map((lm) => (
+          {landmarkKeyEn.map((lm) => (
             <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
               <CheckCircle2 class="w-4 h-4 text-blue-600 shrink-0" />
               <span>{lm}</span>
             </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Recommended Units Cardview (EN) -->
+      <div class="space-y-4 pt-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold mb-1">
+              <Flame class="w-3.5 h-3.5 text-amber-600" />
+              <span>Most Popular & In-Demand Cars</span>
+            </span>
+            <h2 class="text-lg font-black text-slate-900">Recommended Units</h2>
+          </div>
+          <a href="/en/car" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+            <span>View All Cars</span>
+            <ArrowRight class="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {popularCars.map((car) => (
+            <VehicleCard
+              id={car.id}
+              slug={car.id.replace(/\.md$/, '')}
+              data={car.data}
+              lang="en"
+            />
           ))}
         </div>
       </div>
@@ -87,7 +129,7 @@ const waUrl = buildWhatsAppUrl({
           Scheduled Arrival Handover
         </span>
         <h3 class="text-lg font-black text-slate-900 mb-2">
-          Pickup at {d.areaName}
+          Pickup at {areaNameEn}
         </h3>
         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
           Send your ferry departure schedule or flight number to our WhatsApp admin. Our crew will standby before your arrival.

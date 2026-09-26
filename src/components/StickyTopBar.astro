@@ -1,16 +1,17 @@
 ---
-import { MapPin, Globe } from '@lucide/astro';
+import { MapPin, Globe, ChevronDown, Menu, X, ChevronRight, MessageCircle, Check } from '@lucide/astro';
 import { getAlternateUrl } from '../utils/i18n';
 
 interface Props {
   lang?: 'id' | 'en';
   currentPath?: string;
+  alternateUrl?: string;
 }
 
-const { lang = 'id', currentPath = '/' } = Astro.props;
+const { lang = 'id', currentPath = '/', alternateUrl } = Astro.props;
 
-const idSwitchUrl = getAlternateUrl(currentPath, 'id');
-const enSwitchUrl = getAlternateUrl(currentPath, 'en');
+const idSwitchUrl = (lang === 'en' && alternateUrl) ? alternateUrl : getAlternateUrl(currentPath, 'id');
+const enSwitchUrl = (lang === 'id' && alternateUrl) ? alternateUrl : getAlternateUrl(currentPath, 'en');
 
 const navLinks = lang === 'en' ? [
   { href: '/en', label: 'Home' },
@@ -28,27 +29,25 @@ const navLinks = lang === 'en' ? [
 ---
 
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
     <!-- Brand / Logo -->
-    <a href={lang === 'en' ? '/en' : '/'} class="flex items-center gap-2 group shrink-0">
-      <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:scale-105 transition-transform">
-        L
-      </div>
+    <a href={lang === 'en' ? '/en' : '/'} class="flex items-center gap-2.5 group shrink-0">
+      <img
+        src="/favicon.svg"
+        alt="Lincah Rent Car Logo"
+        class="w-9 h-9 rounded-xl shadow-xs group-hover:scale-105 transition-transform shrink-0"
+        width="36"
+        height="36"
+      />
       <div class="flex flex-col">
         <span class="font-extrabold text-base tracking-tight text-slate-900 leading-none">
           LINCAH<span class="text-blue-600 font-black">RENT</span>
         </span>
-        <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Batam Car Rental</span>
+        <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider" id="header-brand-subtitle">Batam Car Rental</span>
       </div>
     </a>
 
-    <!-- Location Pin Badge (Batam) -->
-    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
-      <MapPin class="w-3.5 h-3.5 text-blue-600 shrink-0" />
-      <span>Batam</span>
-    </div>
-
-    <!-- Desktop Navigation Menu -->
+    <!-- Desktop Navigation Menu (Desktop Only) -->
     <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
       {navLinks.map((link) => {
         const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en' && currentPath.startsWith(link.href));
@@ -66,11 +65,54 @@ const navLinks = lang === 'en' ? [
       })}
     </nav>
 
-    <!-- Language Pill Switcher & CTA -->
-    <div class="flex items-center gap-2 shrink-0">
+    <!-- Desktop Controls: City Switcher, Lang, & WA CTA (Desktop Only) -->
+    <div class="hidden md:flex items-center gap-2.5 shrink-0">
+      <!-- Desktop City Switcher Dropdown -->
+      <div class="relative" id="city-dropdown-container">
+        <button
+          type="button"
+          id="city-dropdown-trigger"
+          class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-200 hover:border-blue-300 transition-all cursor-pointer"
+          aria-expanded="false"
+          aria-label="Pilih Kota Layanan"
+        >
+          <MapPin class="w-3.5 h-3.5 text-blue-600 shrink-0" />
+          <span class="desktop-city-label">Batam</span>
+          <ChevronDown class="w-3 h-3 text-slate-400 transition-transform duration-200" id="city-chevron" />
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div
+          id="city-dropdown-menu"
+          class="hidden absolute left-0 mt-1.5 w-44 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+        >
+          <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+            Pilih Kota Layanan
+          </div>
+          <button
+            type="button"
+            data-select-city="batam"
+            class="city-option-btn flex items-center justify-between w-full px-3 py-2 text-xs font-semibold hover:bg-slate-50 transition-colors text-left cursor-pointer"
+          >
+            <span>Batam</span>
+            <span class="city-check-dot w-1.5 h-1.5 rounded-full bg-blue-600 hidden" data-city="batam"></span>
+          </button>
+          <button
+            type="button"
+            data-select-city="palembang"
+            class="city-option-btn flex items-center justify-between w-full px-3 py-2 text-xs font-semibold hover:bg-slate-50 transition-colors text-left cursor-pointer"
+          >
+            <span>Palembang</span>
+            <span class="city-check-dot w-1.5 h-1.5 rounded-full bg-blue-600 hidden" data-city="palembang"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Language Pill Switcher -->
       <div class="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 text-xs font-bold">
         <a
           href={idSwitchUrl}
+          data-lang-switch="id"
           class:list={[
             "px-2.5 py-1 rounded-full transition-all text-[11px]",
             lang === 'id' ? "bg-white text-blue-700 shadow-xs font-black" : "text-slate-500 hover:text-slate-800"
@@ -81,6 +123,7 @@ const navLinks = lang === 'en' ? [
         </a>
         <a
           href={enSwitchUrl}
+          data-lang-switch="en"
           class:list={[
             "px-2.5 py-1 rounded-full transition-all text-[11px]",
             lang === 'en' ? "bg-white text-blue-700 shadow-xs font-black" : "text-slate-500 hover:text-slate-800"
@@ -90,16 +133,405 @@ const navLinks = lang === 'en' ? [
           EN
         </a>
       </div>
+    </div>
 
-      <!-- Quick WA Button on Top for Desktop -->
-      <a
-        href="https://wa.me/6281373703639?text=Halo%20Admin%20Lincah%20Rent%20Car,%20saya%20ingin%20tanya%20sewa%20mobil%20di%20Batam"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs"
+    <!-- Mobile Hamburger Trigger Button (Mobile Only) -->
+    <div class="flex md:hidden items-center gap-1.5">
+      <button
+        type="button"
+        id="mobile-menu-trigger"
+        class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
+        aria-label="Buka Menu Navigasi"
+        aria-expanded="false"
       >
-        <span>WA 24/7</span>
-      </a>
+        <Menu class="w-6 h-6" />
+      </button>
     </div>
   </div>
 </header>
+
+<!-- Mobile Navigation Drawer Overlay Backdrop -->
+<div
+  id="mobile-menu-backdrop"
+  class="md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 transition-opacity duration-300 opacity-0 pointer-events-none"
+  aria-hidden="true"
+></div>
+
+<!-- Mobile Navigation Drawer Panel -->
+<div
+  id="mobile-menu-drawer"
+  class="md:hidden fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-50 shadow-2xl p-5 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu Navigasi Mobile"
+>
+  <div class="space-y-6">
+    <!-- Top Drawer Bar -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <img src="/favicon.svg" alt="Lincah Logo" class="w-7 h-7 rounded-lg" width="28" height="28" />
+        <span class="font-extrabold text-sm text-slate-900">LINCAH<span class="text-blue-600">RENT</span></span>
+      </div>
+      <button
+        type="button"
+        id="mobile-menu-close"
+        class="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+        aria-label="Tutup Menu"
+      >
+        <X class="w-5 h-5" />
+      </button>
+    </div>
+
+    <!-- Section 1: Pilihan Kota (City Location) -->
+    <div>
+      <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-2.5">
+        <MapPin class="w-3.5 h-3.5 text-blue-600" />
+        <span>{lang === 'en' ? 'Service City' : 'Kota Layanan'}</span>
+      </span>
+      <div class="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          data-select-city="batam"
+          class="mobile-city-btn flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer"
+        >
+          <span>Batam</span>
+          <Check class="w-3.5 h-3.5 mobile-city-check hidden" data-city="batam" />
+        </button>
+        <button
+          type="button"
+          data-select-city="palembang"
+          class="mobile-city-btn flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer"
+        >
+          <span>Palembang</span>
+          <Check class="w-3.5 h-3.5 mobile-city-check hidden" data-city="palembang" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 2: Pilihan Bahasa (Language ID / EN) -->
+    <div>
+      <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-2.5">
+        <Globe class="w-3.5 h-3.5 text-blue-600" />
+        <span>{lang === 'en' ? 'Language Edition' : 'Pilihan Bahasa'}</span>
+      </span>
+      <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
+        <a
+          href={idSwitchUrl}
+          data-lang-switch="id"
+          class:list={[
+            "flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all",
+            lang === 'id' ? "bg-white text-blue-700 shadow-xs font-black" : "text-slate-600 hover:text-slate-900"
+          ]}
+          aria-label="Bahasa Indonesia"
+        >
+          <span>🇮🇩 ID (Indo)</span>
+        </a>
+        <a
+          href={enSwitchUrl}
+          data-lang-switch="en"
+          class:list={[
+            "flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all",
+            lang === 'en' ? "bg-white text-blue-700 shadow-xs font-black" : "text-slate-600 hover:text-slate-900"
+          ]}
+          aria-label="English Edition"
+        >
+          <span>🇬🇧 EN (Eng)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Section 3: Menu Navigasi -->
+    <div>
+      <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-2">
+        {lang === 'en' ? 'Navigation' : 'Menu Navigasi'}
+      </span>
+      <div class="space-y-1">
+        {navLinks.map((link) => {
+          const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en' && currentPath.startsWith(link.href));
+          return (
+            <a
+              href={link.href}
+              class:list={[
+                "flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-colors",
+                isActive ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
+              ]}
+            >
+              <span>{link.label}</span>
+              <ChevronRight class="w-4 h-4 text-slate-400" />
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Footer: Quick WhatsApp CTA -->
+  <div class="pt-6 border-t border-slate-100">
+    <a
+      href="https://wa.me/6281373703639?text=Halo%20Admin%20Lincah%20Rent%20Car,%20saya%20ingin%20tanya%20sewa%20mobil"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs shadow-md transition-all"
+    >
+      <MessageCircle class="w-4 h-4 fill-current" />
+      <span>{lang === 'en' ? 'Chat WhatsApp 24/7' : 'Hubungi WhatsApp 24/7'}</span>
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+  function setupStickyTopBar() {
+    // 1. Elements
+    const trigger = document.getElementById('city-dropdown-trigger');
+    const menu = document.getElementById('city-dropdown-menu');
+    const chevron = document.getElementById('city-chevron');
+    const desktopCityLabel = document.querySelector('.desktop-city-label');
+    const cityButtons = document.querySelectorAll('[data-select-city]');
+    const desktopDots = document.querySelectorAll('.city-check-dot');
+    const mobileChecks = document.querySelectorAll('.mobile-city-check');
+    const mobileBtns = document.querySelectorAll('.mobile-city-btn');
+
+    // Drawer elements
+    const mobileTrigger = document.getElementById('mobile-menu-trigger');
+    const mobileClose = document.getElementById('mobile-menu-close');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
+    const drawer = document.getElementById('mobile-menu-drawer');
+
+    // 2. City State Logic
+    let activeCity = 'batam';
+    try {
+      const saved = localStorage.getItem('lincah_city');
+      if (saved === 'palembang' || saved === 'batam') {
+        activeCity = saved;
+      }
+    } catch (e) {}
+
+    function updateCityUI(city) {
+      const isPalembang = city === 'palembang';
+      const cityName = isPalembang ? 'Palembang' : 'Batam';
+
+      // Desktop label
+      if (desktopCityLabel) {
+        desktopCityLabel.textContent = cityName;
+      }
+
+      // Desktop dropdown dots
+      desktopDots.forEach((dot) => {
+        if (dot.getAttribute('data-city') === city) {
+          dot.classList.remove('hidden');
+        } else {
+          dot.classList.add('hidden');
+        }
+      });
+
+      // Mobile drawer button styling & checkmark
+      mobileBtns.forEach((btn) => {
+        const btnCity = btn.getAttribute('data-select-city');
+        if (btnCity === city) {
+          btn.className = 'mobile-city-btn flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer bg-blue-50 border-blue-600 text-blue-700 shadow-xs';
+        } else {
+          btn.className = 'mobile-city-btn flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer bg-white border-slate-200 text-slate-700 hover:bg-slate-50';
+        }
+      });
+
+      mobileChecks.forEach((chk) => {
+        if (chk.getAttribute('data-city') === city) {
+          chk.classList.remove('hidden');
+        } else {
+          chk.classList.add('hidden');
+        }
+      });
+
+      // Brand subtitle in header navbar
+      const headerBrand = document.getElementById('header-brand-subtitle');
+      if (headerBrand) {
+        headerBrand.textContent = isPalembang ? 'Palembang Car Rental' : 'Batam Car Rental';
+      }
+
+      // Brand subtitle in footer
+      const footerBrand = document.getElementById('footer-brand-subtitle');
+      if (footerBrand) {
+        footerBrand.textContent = isPalembang ? 'Palembang Car Rental' : 'Batam Car Rental';
+      }
+
+      // Brand description in footer
+      const footerDesc = document.getElementById('footer-brand-desc');
+      if (footerDesc) {
+        footerDesc.textContent = isPalembang
+          ? 'Sewa mobil cepat, nyaman, dan fleksibel di Palembang. Layanan lepas kunci & dengan supir dengan serah terima di Bandara SMB II, Stasiun Kertapati & hotel.'
+          : 'Sewa mobil cepat, nyaman, dan fleksibel di Batam. Layanan lepas kunci & dengan supir dengan serah terima gratis di pelabuhan & bandara.';
+      }
+
+      // Footer pickup hubs toggle
+      const footerHubsBatam = document.getElementById('footer-hubs-batam');
+      const footerHubsPalembang = document.getElementById('footer-hubs-palembang');
+      if (footerHubsBatam && footerHubsPalembang) {
+        if (isPalembang) {
+          footerHubsBatam.classList.add('hidden');
+          footerHubsPalembang.classList.remove('hidden');
+        } else {
+          footerHubsPalembang.classList.add('hidden');
+          footerHubsBatam.classList.remove('hidden');
+        }
+      }
+
+      // Footer hubs title
+      const footerHubsTitle = document.getElementById('footer-hubs-title');
+      if (footerHubsTitle) {
+        const titleBatam = footerHubsTitle.getAttribute('data-title-batam') || 'Titik Jemput Populer (Batam)';
+        const titlePalembang = footerHubsTitle.getAttribute('data-title-palembang') || 'Titik Jemput Populer (Palembang)';
+        footerHubsTitle.textContent = isPalembang ? titlePalembang : titleBatam;
+      }
+
+      // Footer active office badge toggle
+      const officeBatamBadge = document.getElementById('office-batam-badge');
+      const officePalembangBadge = document.getElementById('office-palembang-badge');
+      if (officeBatamBadge && officePalembangBadge) {
+        if (isPalembang) {
+          officeBatamBadge.classList.add('hidden');
+          officePalembangBadge.classList.remove('hidden');
+        } else {
+          officePalembangBadge.classList.add('hidden');
+          officeBatamBadge.classList.remove('hidden');
+        }
+      }
+
+      // Swap logo images
+      document.querySelectorAll('img').forEach((img) => {
+        const src = img.getAttribute('src') || '';
+        if (src.includes('logo.svg') || src.includes('logo-palembang.svg')) {
+          img.src = isPalembang ? '/logo-palembang.svg' : '/logo.svg';
+        }
+      });
+
+      // Broadcast cityChange event to current page (home, mobil, layanan, lokasi)
+      window.dispatchEvent(new CustomEvent('cityChange', { detail: { city } }));
+    }
+
+    updateCityUI(activeCity);
+
+    // 3. Desktop Dropdown Handlers
+    if (trigger && menu) {
+      function toggleMenu(e) {
+        e.stopPropagation();
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          trigger.setAttribute('aria-expanded', 'true');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+          menu.classList.add('hidden');
+          trigger.setAttribute('aria-expanded', 'false');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      function closeMenu(e) {
+        if (!menu.contains(e.target) && !trigger.contains(e.target)) {
+          menu.classList.add('hidden');
+          trigger.setAttribute('aria-expanded', 'false');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      trigger.removeEventListener('click', trigger._clickHandler);
+      trigger._clickHandler = toggleMenu;
+      trigger.addEventListener('click', toggleMenu);
+
+      document.removeEventListener('click', closeMenu);
+      document.addEventListener('click', closeMenu);
+    }
+
+    // 4. City Select Buttons (handles both Desktop & Mobile)
+    cityButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selected = btn.getAttribute('data-select-city');
+        if (!selected) return;
+
+        try { localStorage.setItem('lincah_city', selected); } catch (e) {}
+        updateCityUI(selected);
+
+        if (menu) {
+          menu.classList.add('hidden');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+
+        // Close mobile drawer on selection after short delay
+        if (drawer && !drawer.classList.contains('translate-x-full')) {
+          setTimeout(closeDrawer, 180);
+        }
+      });
+    });
+
+    // 5. Mobile Drawer Handlers
+    function openDrawer() {
+      if (!drawer || !backdrop) return;
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100');
+      drawer.classList.remove('translate-x-full');
+      drawer.classList.add('translate-x-0');
+      if (mobileTrigger) mobileTrigger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      if (!drawer || !backdrop) return;
+      drawer.classList.remove('translate-x-0');
+      drawer.classList.add('translate-x-full');
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      setTimeout(() => {
+        backdrop.classList.add('pointer-events-none');
+        document.body.style.overflow = '';
+      }, 300);
+      if (mobileTrigger) mobileTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    if (mobileTrigger) {
+      mobileTrigger.removeEventListener('click', mobileTrigger._openHandler);
+      mobileTrigger._openHandler = openDrawer;
+      mobileTrigger.addEventListener('click', openDrawer);
+    }
+
+    if (mobileClose) {
+      mobileClose.removeEventListener('click', mobileClose._closeHandler);
+      mobileClose._closeHandler = closeDrawer;
+      mobileClose.addEventListener('click', closeDrawer);
+    }
+
+    if (backdrop) {
+      backdrop.removeEventListener('click', backdrop._closeHandler);
+      backdrop._closeHandler = closeDrawer;
+      backdrop.addEventListener('click', closeDrawer);
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer && !drawer.classList.contains('translate-x-full')) {
+        closeDrawer();
+      }
+    });
+
+    // 6. Language Switch Click Handlers
+    document.querySelectorAll('[data-lang-switch]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetLang = btn.getAttribute('data-lang-switch');
+        if (targetLang) {
+          try {
+            localStorage.setItem('lincah_lang', targetLang);
+          } catch (e) {}
+        }
+      });
+    });
+
+    // Sync active page language to localStorage
+    try {
+      const isEnPage = window.location.pathname.startsWith('/en');
+      localStorage.setItem('lincah_lang', isEnPage ? 'en' : 'id');
+    } catch (e) {}
+  }
+
+  document.addEventListener('DOMContentLoaded', setupStickyTopBar);
+  document.addEventListener('astro:page-load', setupStickyTopBar);
+</script>

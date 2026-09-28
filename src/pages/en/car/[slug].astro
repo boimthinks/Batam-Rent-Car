@@ -51,7 +51,7 @@ const productSchema = {
     "priceCurrency": "IDR",
     "price": minPrice,
     "availability": "https://schema.org/InStock",
-    "url": `https://lincahrentcar.com/en/car/${slug}`,
+    "url": `https://lincahrentcar.com/en/car/${slug}/`,
     "seller": {
       "@type": "AutoRental",
       "name": "Lincah Rent Car"
@@ -68,7 +68,7 @@ const productSchema = {
   schema={productSchema}
 >
   <div class="mb-3 flex items-center justify-between">
-    <a href="/en/car" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+    <a href="/en/car/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
       <ArrowLeft class="w-4 h-4" />
       <span>Back to All Cars</span>
     </a>
@@ -145,7 +145,7 @@ const productSchema = {
             </span>
             <h2 class="text-lg font-black text-slate-900"><span class="city-name-dyn">Batam</span> Pickup Hubs</h2>
           </div>
-          <a href="/en/lokasi" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <a href="/en/lokasi/" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>All Pickup Hubs</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -170,7 +170,7 @@ const productSchema = {
                 data-city={locCity}
               >
                 <div>
-                  <a href={`/en/lokasi/${locSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+                  <a href={`/en/lokasi/${locSlug}/`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
                     <img
                       src={locData.image}
                       alt={locData.title}
@@ -188,7 +188,7 @@ const productSchema = {
 
                   <div class="p-3.5">
                     <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
-                      <a href={`/en/lokasi/${locSlug}`}>{locAreaName}</a>
+                      <a href={`/en/lokasi/${locSlug}/`}>{locAreaName}</a>
                     </h3>
                     <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                       {locDesc}
@@ -198,7 +198,7 @@ const productSchema = {
 
                 <div class="p-3.5 pt-0">
                   <a
-                    href={`/en/lokasi/${locSlug}`}
+                    href={`/en/lokasi/${locSlug}/`}
                     class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600 group-hover:text-blue-700"
                   >
                     <span>Handover Details</span>

@@ -45,7 +45,7 @@ const productSchema = {
     "priceCurrency": "IDR",
     "price": minPrice,
     "availability": "https://schema.org/InStock",
-    "url": `https://lincahrentcar.com/mobil/${slug}`,
+    "url": `https://lincahrentcar.com/mobil/${slug}/`,
     "seller": {
       "@type": "AutoRental",
       "name": "Lincah Rent Car"
@@ -62,7 +62,7 @@ const productSchema = {
 >
   <!-- Back Button & Breadcrumbs -->
   <div class="mb-3 flex items-center justify-between">
-    <a href="/mobil" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+    <a href="/mobil/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
       <ArrowLeft class="w-4 h-4" />
       <span>Kembali ke Katalog Mobil</span>
     </a>
@@ -144,7 +144,7 @@ const productSchema = {
             </span>
             <h2 class="text-lg font-black text-slate-900">Layanan Tersedia untuk {d.carModel}</h2>
           </div>
-          <a href="/layanan" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <a href="/layanan/" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>Semua Layanan</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -157,7 +157,7 @@ const productSchema = {
             return (
               <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-blue-500 hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
                 <div>
-                  <a href={`/layanan/${srvSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+                  <a href={`/layanan/${srvSlug}/`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
                     <img
                       src={srvData.image}
                       alt={srvData.title}
@@ -171,7 +171,7 @@ const productSchema = {
 
                   <div class="p-3.5">
                     <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
-                      <a href={`/layanan/${srvSlug}`}>{srvData.title}</a>
+                      <a href={`/layanan/${srvSlug}/`}>{srvData.title}</a>
                     </h3>
                     <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                       {srvData.shortDesc}
@@ -181,7 +181,7 @@ const productSchema = {
 
                 <div class="p-3.5 pt-0">
                   <a
-                    href={`/layanan/${srvSlug}`}
+                    href={`/layanan/${srvSlug}/`}
                     class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600 group-hover:text-blue-700"
                   >
                     <span>Pelajari Detail</span>
@@ -204,7 +204,7 @@ const productSchema = {
             </span>
             <h2 class="text-lg font-black text-slate-900">Titik Jemput di <span class="city-name-dyn">Batam</span></h2>
           </div>
-          <a href="/lokasi" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <a href="/lokasi/" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>Semua Titik Jemput</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -225,7 +225,7 @@ const productSchema = {
                 data-city={locCity}
               >
                 <div>
-                  <a href={`/lokasi/${locSlug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+                  <a href={`/lokasi/${locSlug}/`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
                     <img
                       src={locData.image}
                       alt={locData.title}
@@ -243,7 +243,7 @@ const productSchema = {
 
                   <div class="p-3.5">
                     <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
-                      <a href={`/lokasi/${locSlug}`}>{locData.areaName}</a>
+                      <a href={`/lokasi/${locSlug}/`}>{locData.areaName}</a>
                     </h3>
                     <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                       {locData.description}
@@ -253,7 +253,7 @@ const productSchema = {
 
                 <div class="p-3.5 pt-0">
                   <a
-                    href={`/lokasi/${locSlug}`}
+                    href={`/lokasi/${locSlug}/`}
                     class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600 group-hover:text-blue-700"
                   >
                     <span>Rincian Serah Terima</span>

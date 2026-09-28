@@ -1,0 +1,163 @@
+# =============================================================================
+# Lincah Rent Car - Apache config untuk SHARED HOSTING (cPanel/LiteSpeed/XaPanel)
+# -----------------------------------------------------------------------------
+# File ini WAJIB berada di DOCUMENT ROOT (folder yang isinya `index.html`).
+# Astro menyalin otomatis `public/.htaccess` -> `dist/.htaccess` setiap build.
+#
+# Isi file ini harus SAMA dengan:
+#   - `site: 'https://lincahrentcar.com'` di astro.config.mjs
+#   - `trailingSlash: 'always'` di astro.config.mjs  (semua URL berakhir dengan /)
+#
+# ATURAN EMAS: JANGAN memakai directive `Options` di file ini.
+#   Directive `Options` butuh `AllowOverride Options`, sedangkan banyak shared
+#   hosting hanya `AllowOverride FileInfo`. Hasilnya HTTP 500 di SELURUH situs
+#   dengan pesan "Options not allowed here". Baris `Options` sengaja dihapus.
+#   Directory listing & content negotiation/settings lain diatur lewat panel
+#   hosting, bukan dari sini.
+#
+# CARA PAKAI:
+#   npm run build  ->  upload ISI FOLDER dist/ ke public_html/
+#   Pastikan file dot-file ikut ter-upload (cPanel: centang "Show Hidden Files").
+#
+# Troubleshooting:
+#   - 500 "Options not allowed here"  : pakai versi lama file ini, upload ulang
+#   - 500 "RewriteEngine not allowed"  : aktifkan mod_rewrite lewat panel hosting
+#   - Loop redirect HTTPS              : SSL belum aktif / sudah redirect di panel
+#   - Lihat log persis: cPanel -> Errors (Error Log)
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# 1. MIME TYPE (penting untuk .webp & .woff2 di Apache versi lama)
+# -----------------------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddDefaultCharset UTF-8
+  AddType image/webp        .webp
+  AddType font/woff2        .woff2
+  AddType font/woff         .woff
+  AddType image/svg+xml     .svg
+  AddType application/xml   .xml
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 2. HALAMAN 404
+#    Astro menghasilkan 404.html di root. URL asli tetap dipertahankan (SEO).
+# -----------------------------------------------------------------------------
+<IfModule mod_core.c>
+  ErrorDocument 404 /404.html
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 3. HTTPS + HOST CANONICAL + TRAILING SLASH
+#    Seluruh blok opsional. Kalau hosting sudah mengatur HTTPS + redirect lewat
+#    panelnya, hapus saja blok 3a dan 3b.
+# -----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 3a. Paksa HTTPS (aman juga kalau di belakang proxy/SSL terminator)
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # 3b. Buang "www." - canonical host = lincahrentcar.com (tanpa www)
+  #     Hapus blok ini kalau domain produksi Anda memang memakai www.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # 3c. TRAILING SLASH WAJIB
+  #     Hanya redirect kalau halaman dengan slash benar-benar ada, supaya URL
+  #     sampah tidak berubah jadi rantai 301 -> 404 (soft-404).
+  #     CATATAN: kalau blok 3 mati (mis. FollowSymLinks off), trailing slash
+  #     tetap bekerja karena mod_dir meng-301 folder yang diakses tanpa slash.
+  RewriteCond %{REQUEST_URI} !/$
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/index.html -f
+  RewriteRule ^(.*)$ $1/ [R=301,L]
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 4. KEAMANAN
+#    Blokir file sumber/konfigurasi. Pengaman kalau tanpa sengaja meng-upload
+#    folder project (src, node_modules, .env, dsb) alih-alih folder dist.
+# -----------------------------------------------------------------------------
+<IfModule mod_alias.c>
+  RedirectMatch 404 ^/(?:\.(?!well-known)|src/|node_modules/|dist/|\.astro/|fix/|content/|\.git/) [NC]
+  RedirectMatch 404 \.(?:md|mdx|ts|tsx|astro|vue|svelte|csv|log|lock|yml|yaml|env|map|zip|bak|sql)$ [NC]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  # Aktifkan HSTS hanya setelah HTTPS stabil 1-2 minggu:
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 5. CACHE
+#    HTML/XML/TXT: selalu revalidasi (murah, selalu segar).
+#    Aset _astro (ber-hash) + gambar + font: cache 1 tahun + immutable.
+# -----------------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 week"
+
+  ExpiresByType text/html               "access plus 0 seconds"
+  ExpiresByType text/plain              "access plus 0 seconds"
+  ExpiresByType text/xml                "access plus 1 day"
+  ExpiresByType application/xml         "access plus 1 day"
+  ExpiresByType text/css                "access plus 1 year"
+  ExpiresByType application/javascript  "access plus 1 year"
+  ExpiresByType text/javascript         "access plus 1 year"
+  ExpiresByType image/webp              "access plus 6 months"
+  ExpiresByType image/svg+xml           "access plus 6 months"
+  ExpiresByType image/png               "access plus 6 months"
+  ExpiresByType image/x-icon            "access plus 1 year"
+  ExpiresByType font/woff2              "access plus 1 year"
+  ExpiresByType font/woff               "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|svg|png|woff2?|js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 6. KOMPRESI (pilih yang didukung server: brotli / deflate / zstd)
+# -----------------------------------------------------------------------------
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+  AddOutputFilterByType BROTLI_COMPRESS application/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_zstd.c>
+  AddOutputFilterByType ZSTD_CODING text/html text/plain text/css text/xml
+  AddOutputFilterByType ZSTD_CODING application/javascript application/json
+  AddOutputFilterByType ZSTD_CODING application/xml image/svg+xml
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 7. CATATAN: `ServerSignature Off` dan `ServerTokens Prod` TIDAK boleh dipasang
+#    di .htaccess (hanya server config / vhost) -> justru memicu 500.
+#    Untuk LiteSpeed, pakai php.ini: expose_php = Off
+# =============================================================================

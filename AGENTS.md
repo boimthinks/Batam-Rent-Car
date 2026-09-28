@@ -50,6 +50,16 @@ Website melayani dua kota operasional (**Batam** sebagai flagship & **Palembang*
 - `/en/lokasi/` & `/en/lokasi/[slug]` (Titik jemput versi English)
 - `/en/guide/` & `/en/guide/[slug]` (Panduan travel versi English, berpasangan dengan `/blog/` via `alternateSlug`)
 
+## Aturan URL (Trailing Slash WAJIB)
+- Standar URL produksi: **selalu berakhir dengan `/`** (contoh: `https://lincahrentcar.com/en/lokasi/harbour-bay/`). Server host melakukan `301` dari URL tanpa slash ke URL WITH slash.
+- Konfigurasi: `trailingSlash: 'always'` di `astro.config.mjs` (canonical, hreflang, dan sitemap otomatis ikut memakai trailing slash).
+- Helper: `src/utils/url.ts` → `withSlash(path)` untuk path internal, `absUrl(path)` untuk URL absolut (canonical/hreflang/JSON-LD). Jangan menulis URL absolut manual.
+- Saat menambah halaman, komponen, atau aturan autolink:
+  - `href="/mobil/fortuner/"` (literal trailing slash) — **dilarang** `href="/mobil/fortuner"`.
+  - Path dihitung di frontmatter/TS wajib dibungkus `withSlash()` / `absUrl()`.
+  - URL dengan ekstensi file (aset: `/favicon.svg`, `/images/...`) **tidak** diberi trailing slash.
+- Halaman `404` tidak boleh punya canonical/hreflang; layout otomatis memberi `noindex, follow`.
+
 ## Standar Menulis Artikel Blog Baru (Protokol AI Agent)
 Ketika diminta membuat artikel baru, ikuti protokol berikut tanpa kecuali:
 1. **Wajib Berpasangan**:

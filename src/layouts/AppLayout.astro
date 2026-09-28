@@ -5,6 +5,7 @@ import LanguageBanner from '../components/LanguageBanner.astro';
 import GoogleSourcePreferences from '../components/GoogleSourcePreferences.astro';
 import { ClientRouter } from 'astro:transitions';
 import { getAlternateUrl } from '../utils/i18n';
+import { absUrl, withSlash, SITE_URL } from '../utils/url';
 import { MapPin, Phone, Clock, ShieldCheck, Award } from '@lucide/astro';
 import '../styles/global.css';
 
@@ -29,17 +30,22 @@ const {
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
-const siteUrl = 'https://lincahrentcar.com';
-const resolvedCanonical = canonicalUrl || `${siteUrl}${currentPath}`;
+const siteUrl = SITE_URL;
+
+// 404 pages must not be indexed and have no canonical/hreflang of their own.
+const is404 = withSlash(currentPath) === '/404/';
+
+// Every emitted URL must carry a trailing slash (trailingSlash: 'always').
+const resolvedCanonical = is404 ? `${siteUrl}/404/` : absUrl(canonicalUrl || withSlash(currentPath));
 
 // Calculate alternate hreflangs using unified i18n helper or explicit alternateUrl
 const isEn = lang === 'en';
 const idUrl = isEn
-  ? (alternateUrl ? `${siteUrl}${alternateUrl}` : `${siteUrl}${getAlternateUrl(currentPath, 'id')}`)
-  : `${siteUrl}${getAlternateUrl(currentPath, 'id')}`;
+  ? absUrl(alternateUrl || getAlternateUrl(currentPath, 'id'))
+  : absUrl(getAlternateUrl(currentPath, 'id'));
 const enUrl = !isEn
-  ? (alternateUrl ? `${siteUrl}${alternateUrl}` : `${siteUrl}${getAlternateUrl(currentPath, 'en')}`)
-  : `${siteUrl}${getAlternateUrl(currentPath, 'en')}`;
+  ? absUrl(alternateUrl || getAlternateUrl(currentPath, 'en'))
+  : absUrl(getAlternateUrl(currentPath, 'en'));
 
 const defaultLocalBusinessSchema = {
   "@context": "https://schema.org",
@@ -90,15 +96,18 @@ const finalSchemas = schema
 
     <title>{title} | Lincah Rent Car Batam</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={resolvedCanonical} />
+    {is404 ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={resolvedCanonical} />}
 
     <!-- Seamless View Transitions Client Router -->
     <ClientRouter />
 
     <!-- Multilingual hreflang alternates -->
-    <link rel="alternate" hreflang="id" href={idUrl} />
-    <link rel="alternate" hreflang="en" href={enUrl} />
-    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
+    {!is404 && (
+      <>
+        <link rel="alternate" hreflang="id" href={idUrl} />
+        <link rel="alternate" hreflang="en" href={enUrl} />
+      </>
+    )}
 
     <!-- LLM agent discoverability (llms.txt standard) -->
     <link rel="describedby" type="text/markdown" href="/llms.txt" title="Lincah Rent Car overview for LLM agents" />
@@ -175,12 +184,12 @@ const finalSchemas = schema
               {isEn ? "Quick Links" : "Navigasi Cepat"}
             </h3>
             <ul class="space-y-2 text-xs text-slate-400">
-              <li><a href={isEn ? "/en/car" : "/mobil"} class="hover:text-white transition-colors">{isEn ? "All Cars" : "Katalog Mobil"}</a></li>
-              <li><a href={isEn ? "/en/layanan/lepas-kunci" : "/layanan/lepas-kunci"} class="hover:text-white transition-colors">{isEn ? "Self-Drive" : "Sewa Lepas Kunci"}</a></li>
-              <li><a href={isEn ? "/en/layanan/dengan-supir" : "/layanan/dengan-supir"} class="hover:text-white transition-colors">{isEn ? "With Driver" : "Sewa Dengan Supir"}</a></li>
-              <li><a href={isEn ? "/en/layanan/sewa-mingguan" : "/layanan/sewa-mingguan"} class="hover:text-white transition-colors">{isEn ? "Weekly Rental" : "Sewa Mobil Mingguan"}</a></li>
-              <li><a href={isEn ? "/en/lokasi" : "/lokasi"} class="hover:text-white transition-colors">{isEn ? "Pickup Hubs" : "Titik Jemput Pelabuhan"}</a></li>
-              <li><a href={isEn ? "/en/guide" : "/blog"} class="hover:text-white transition-colors">{isEn ? "Travel Guide" : "Blog & Tips Batam"}</a></li>
+              <li><a href={isEn ? "/en/car/" : "/mobil/"} class="hover:text-white transition-colors">{isEn ? "All Cars" : "Katalog Mobil"}</a></li>
+              <li><a href={isEn ? "/en/layanan/lepas-kunci/" : "/layanan/lepas-kunci/"} class="hover:text-white transition-colors">{isEn ? "Self-Drive" : "Sewa Lepas Kunci"}</a></li>
+              <li><a href={isEn ? "/en/layanan/dengan-supir/" : "/layanan/dengan-supir/"} class="hover:text-white transition-colors">{isEn ? "With Driver" : "Sewa Dengan Supir"}</a></li>
+              <li><a href={isEn ? "/en/layanan/sewa-mingguan/" : "/layanan/sewa-mingguan/"} class="hover:text-white transition-colors">{isEn ? "Weekly Rental" : "Sewa Mobil Mingguan"}</a></li>
+              <li><a href={isEn ? "/en/lokasi/" : "/lokasi/"} class="hover:text-white transition-colors">{isEn ? "Pickup Hubs" : "Titik Jemput Pelabuhan"}</a></li>
+              <li><a href={isEn ? "/en/guide/" : "/blog/"} class="hover:text-white transition-colors">{isEn ? "Travel Guide" : "Blog & Tips Batam"}</a></li>
             </ul>
           </div>
 
@@ -198,21 +207,21 @@ const finalSchemas = schema
 
             <!-- Batam Hubs -->
             <ul class="space-y-2 text-xs text-slate-400" id="footer-hubs-batam">
-              <li><a href={isEn ? "/en/lokasi/batam-centre" : "/lokasi/batam-centre"} class="hover:text-white transition-colors">Batam Centre Ferry Terminal</a></li>
-              <li><a href={isEn ? "/en/lokasi/harbour-bay" : "/lokasi/harbour-bay"} class="hover:text-white transition-colors">Harbour Bay Ferry Terminal</a></li>
-              <li><a href={isEn ? "/en/lokasi/hang-nadim" : "/lokasi/hang-nadim"} class="hover:text-white transition-colors">Bandara Hang Nadim (BTH)</a></li>
-              <li><a href={isEn ? "/en/lokasi/sekupang" : "/lokasi/sekupang"} class="hover:text-white transition-colors">Sekupang Ferry Terminal</a></li>
-              <li><a href={isEn ? "/en/lokasi/mega-legenda" : "/lokasi/mega-legenda"} class="hover:text-white transition-colors">Mega Legenda 2 (Kantor Pusat)</a></li>
+              <li><a href={isEn ? "/en/lokasi/batam-centre/" : "/lokasi/batam-centre/"} class="hover:text-white transition-colors">Batam Centre Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/harbour-bay/" : "/lokasi/harbour-bay/"} class="hover:text-white transition-colors">Harbour Bay Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/hang-nadim/" : "/lokasi/hang-nadim/"} class="hover:text-white transition-colors">Bandara Hang Nadim (BTH)</a></li>
+              <li><a href={isEn ? "/en/lokasi/sekupang/" : "/lokasi/sekupang/"} class="hover:text-white transition-colors">Sekupang Ferry Terminal</a></li>
+              <li><a href={isEn ? "/en/lokasi/mega-legenda/" : "/lokasi/mega-legenda/"} class="hover:text-white transition-colors">Mega Legenda 2 (Kantor Pusat)</a></li>
             </ul>
 
             <!-- Palembang Hubs -->
             <ul class="space-y-2 text-xs text-slate-400 hidden" id="footer-hubs-palembang">
-              <li><a href={isEn ? "/en/lokasi/bandara-smb2-palembang" : "/lokasi/bandara-smb2-palembang"} class="hover:text-white transition-colors">Bandara SMB II (PLM)</a></li>
-              <li><a href={isEn ? "/en/lokasi/stasiun-kertapati-lrt-palembang" : "/lokasi/stasiun-kertapati-lrt-palembang"} class="hover:text-white transition-colors">Stasiun Kertapati & LRT</a></li>
-              <li><a href={isEn ? "/en/lokasi/pelabuhan-tanjung-api-api" : "/lokasi/pelabuhan-tanjung-api-api"} class="hover:text-white transition-colors">Pelabuhan Tanjung Api-Api (TAA)</a></li>
-              <li><a href={isEn ? "/en/lokasi/pusat-kota-sudirman-palembang" : "/lokasi/pusat-kota-sudirman-palembang"} class="hover:text-white transition-colors">Pusat Kota & Jl. Sudirman</a></li>
-              <li><a href={isEn ? "/en/lokasi/ptc-mall-r-sukamto-palembang" : "/lokasi/ptc-mall-r-sukamto-palembang"} class="hover:text-white transition-colors">R. Sukamto & PTC Mall</a></li>
-              <li><a href={isEn ? "/en/lokasi/jakabaring-sport-city-palembang" : "/lokasi/jakabaring-sport-city-palembang"} class="hover:text-white transition-colors">Jakabaring Sport City</a></li>
+              <li><a href={isEn ? "/en/lokasi/bandara-smb2-palembang/" : "/lokasi/bandara-smb2-palembang/"} class="hover:text-white transition-colors">Bandara SMB II (PLM)</a></li>
+              <li><a href={isEn ? "/en/lokasi/stasiun-kertapati-lrt-palembang/" : "/lokasi/stasiun-kertapati-lrt-palembang/"} class="hover:text-white transition-colors">Stasiun Kertapati & LRT</a></li>
+              <li><a href={isEn ? "/en/lokasi/pelabuhan-tanjung-api-api/" : "/lokasi/pelabuhan-tanjung-api-api/"} class="hover:text-white transition-colors">Pelabuhan Tanjung Api-Api (TAA)</a></li>
+              <li><a href={isEn ? "/en/lokasi/pusat-kota-sudirman-palembang/" : "/lokasi/pusat-kota-sudirman-palembang/"} class="hover:text-white transition-colors">Pusat Kota & Jl. Sudirman</a></li>
+              <li><a href={isEn ? "/en/lokasi/ptc-mall-r-sukamto-palembang/" : "/lokasi/ptc-mall-r-sukamto-palembang/"} class="hover:text-white transition-colors">R. Sukamto & PTC Mall</a></li>
+              <li><a href={isEn ? "/en/lokasi/jakabaring-sport-city-palembang/" : "/lokasi/jakabaring-sport-city-palembang/"} class="hover:text-white transition-colors">Jakabaring Sport City</a></li>
             </ul>
           </div>
 

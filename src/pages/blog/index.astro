@@ -39,7 +39,7 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
           data-city={city}
         >
           <div>
-            <a href={`/blog/${slug}`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
+            <a href={`/blog/${slug}/`} class="aspect-[4/3] w-full overflow-hidden bg-slate-100 block">
               <img
                 src={d.featuredImage}
                 alt={d.title}
@@ -59,7 +59,7 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
               </div>
 
               <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 leading-snug">
-                <a href={`/blog/${slug}`}>{d.title}</a>
+                <a href={`/blog/${slug}/`}>{d.title}</a>
               </h2>
 
               <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed">
@@ -70,7 +70,7 @@ const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pu
 
           <div class="p-5 pt-0">
             <a
-              href={`/blog/${slug}`}
+              href={`/blog/${slug}/`}
               class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700"
             >
               <span>Baca Selengkapnya</span>

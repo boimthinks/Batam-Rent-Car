@@ -31,18 +31,31 @@ const { cars, lang = 'id' } = Astro.props;
 const isEn = lang === 'en';
 ---
 
-<!-- Sheet Container (Hidden by default) -->
+<!-- Sheet Container (Hidden by default)
+     - #sheet-root  : wrapper. TIDAK memakai aria-hidden karena berisi elemen fokusable.
+                     Saat tertutup di-set `inert` + `invisible` (hapus dari tab order
+                     DAN dari accessibility tree).
+     - #sheet-backdrop : overlay murni dekoratif, aman memakai aria-hidden. -->
 <div
-  id="sheet-backdrop"
-  class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none flex items-end justify-center"
-  aria-hidden="true"
+  id="sheet-root"
+  class="fixed inset-0 z-50 invisible pointer-events-none"
+  inert
 >
   <div
-    id="sheet-panel"
-    class="w-full max-w-xl bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col transform translate-y-full transition-transform duration-300 ease-out pb-safe"
-    role="dialog"
-    aria-modal="true"
-  >
+    id="sheet-backdrop"
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs opacity-0 transition-opacity duration-300"
+    aria-hidden="true"
+  ></div>
+
+  <div class="absolute inset-0 flex items-end justify-center pointer-events-none">
+    <div
+      id="sheet-panel"
+      class="pointer-events-auto w-full max-w-xl bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col transform translate-y-full transition-transform duration-300 ease-out pb-safe"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sheet-title"
+      tabindex="-1"
+    >
     <!-- Handle bar for swipe hint -->
     <div class="pt-3 pb-1 flex justify-center cursor-grab">
       <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
@@ -68,7 +81,14 @@ const isEn = lang === 'en';
     <div class="overflow-y-auto px-5 py-4 space-y-4">
       <!-- Image & Quick Specs (4:3) -->
       <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-        <img id="sheet-image" src="" alt="" class="w-full h-full object-cover" />
+          <img
+            id="sheet-image"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
+            alt=""
+            width="640"
+            height="480"
+            class="w-full h-full object-cover"
+          />
       </div>
 
       <!-- Specs Pills -->
@@ -153,6 +173,7 @@ const isEn = lang === 'en';
         <span>{isEn ? 'Book via WA' : 'Pesan via WA'}</span>
       </a>
     </div>
+    </div>
   </div>
 </div>
 
@@ -164,9 +185,12 @@ const isEn = lang === 'en';
       carsMap[c.slug] = c;
     });
 
+    const root = document.getElementById('sheet-root');
     const backdrop = document.getElementById('sheet-backdrop');
     const panel = document.getElementById('sheet-panel');
     const closeBtn = document.getElementById('sheet-close-btn');
+    let lastTrigger = null;
+    let closeTimer = null;
 
     const titleEl = document.getElementById('sheet-title');
     const catEl = document.getElementById('sheet-category');
@@ -220,7 +244,7 @@ const isEn = lang === 'en';
       });
 
       // Links
-      detailLinkEl.href = isEn ? `/en/car/${slug}` : `/mobil/${slug}`;
+      detailLinkEl.href = isEn ? `/en/car/${slug}/` : `/mobil/${slug}/`;
       let cityDisplay = 'Batam';
       try {
         const saved = localStorage.getItem('lincah_city');
@@ -233,50 +257,92 @@ const isEn = lang === 'en';
       waBtnEl.href = `https://wa.me/6281373703639?text=${encodeURIComponent(msg)}`;
 
       // Show sheet
-      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      root.classList.remove('invisible', 'pointer-events-none');
+      root.removeAttribute('inert');
+      backdrop.classList.remove('opacity-0');
       backdrop.classList.add('opacity-100');
       panel.classList.remove('translate-y-full');
       panel.classList.add('translate-y-0');
       document.body.style.overflow = 'hidden';
+
+      // Accessibility: bring focus into the dialog
+      if (lastTrigger) lastTrigger.setAttribute('aria-expanded', 'true');
+      panel.focus();
+    }
+
+    function isOpen() {
+      return panel.classList.contains('translate-y-0');
     }
 
     function closeSheet() {
+      if (!isOpen()) return;
       panel.classList.remove('translate-y-0');
       panel.classList.add('translate-y-full');
       backdrop.classList.remove('opacity-100');
       backdrop.classList.add('opacity-0');
-      setTimeout(() => {
-        backdrop.classList.add('pointer-events-none');
+      if (lastTrigger) lastTrigger.setAttribute('aria-expanded', 'false');
+
+      // Return focus to the trigger before hiding
+      if (lastTrigger && typeof lastTrigger.focus === 'function') lastTrigger.focus();
+
+      closeTimer = setTimeout(() => {
+        // `inert` + `invisible` = out of tab order AND out of the a11y tree
+        root.classList.add('invisible', 'pointer-events-none');
+        root.setAttribute('inert', '');
         document.body.style.overflow = '';
       }, 300);
     }
 
     function bindTriggers() {
       document.querySelectorAll('.btn-open-sheet').forEach((btn) => {
-        // Remove existing listener clone to avoid duplication
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode?.replaceChild(newBtn, btn);
-        newBtn.addEventListener('click', (e) => {
+        if (btn.dataset.sheetBound === 'true') return;
+        btn.dataset.sheetBound = 'true';
+        btn.setAttribute('aria-haspopup', 'dialog');
+        btn.setAttribute('aria-controls', 'sheet-panel');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.addEventListener('click', (e) => {
           e.preventDefault();
-          const slug = newBtn.getAttribute('data-open-sheet');
+          lastTrigger = btn;
+          const slug = btn.getAttribute('data-open-sheet');
           if (slug) openSheet(slug);
         });
       });
     }
 
     bindTriggers();
-    document.addEventListener('astro:page-load', bindTriggers);
+    document.addEventListener('astro:page-load', () => {
+      bindTriggers();
+      // Reset state if the sheet is open while navigating
+      if (isOpen()) closeSheet();
+    });
 
     if (closeBtn) closeBtn.addEventListener('click', closeSheet);
-    if (backdrop) {
-      backdrop.addEventListener('click', (e) => {
-        if (e.target === backdrop) closeSheet();
-      });
-    }
+    if (backdrop) backdrop.addEventListener('click', closeSheet);
 
-    // Escape key
+    // Escape closes, Tab is trapped inside the dialog
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeSheet();
+      if (!isOpen()) return;
+
+      if (e.key === 'Escape') {
+        closeSheet();
+        return;
+      }
+
+      if (e.key !== 'Tab' || !panel) return;
+      const focusables = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
   })();
 </script>

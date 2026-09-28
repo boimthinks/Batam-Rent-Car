@@ -1,4 +1,5 @@
 import { autoLinkRules, type AutoLinkRule } from '../data/autolinks';
+import { withSlash } from './url';
 
 interface PreparedKeyword {
   keyword: string;
@@ -116,7 +117,7 @@ export function applyAutoLinks(htmlContent: string, lang: 'id' | 'en' = 'id'): s
         const beforeText = seg.text.slice(0, matchIdx);
         const afterText = seg.text.slice(matchIdx + matchedText.length);
 
-        const anchorHtml = `<a href="${item.url}" class="text-blue-600 hover:text-blue-800 font-semibold underline decoration-blue-300 underline-offset-2 hover:decoration-blue-600 transition-colors" title="${item.title}">${matchedText}</a>`;
+        const anchorHtml = `<a href="${withSlash(item.url)}" class="text-blue-600 hover:text-blue-800 font-semibold underline decoration-blue-300 underline-offset-2 hover:decoration-blue-600 transition-colors" title="${item.title}">${matchedText}</a>`;
 
         // Replace current segment with 3 new segments: [before (text), link (html), after (text)]
         const replacements: Segment[] = [];

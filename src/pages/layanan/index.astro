@@ -30,7 +30,7 @@ const services = await getCollection('layanan');
         <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
           <div>
             <!-- Gambar Layanan 4:3 -->
-            <a href={`/layanan/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+            <a href={`/layanan/${slug}/`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
               <img
                 src={d.image}
                 alt={d.title}
@@ -44,7 +44,7 @@ const services = await getCollection('layanan');
 
             <div class="p-5">
               <h2 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-                <a href={`/layanan/${slug}`}>
+                <a href={`/layanan/${slug}/`}>
                   {d.title}
                 </a>
               </h2>
@@ -66,7 +66,7 @@ const services = await getCollection('layanan');
 
           <div class="p-5 pt-0">
             <a
-              href={`/layanan/${slug}`}
+              href={`/layanan/${slug}/`}
               class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-800 text-xs font-bold transition-all"
             >
               <span>Pelajari Syarat & Rincian</span>

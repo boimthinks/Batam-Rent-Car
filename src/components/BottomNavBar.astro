@@ -10,9 +10,9 @@ const { lang = 'id', currentPath = '/' } = Astro.props;
 
 const isEn = lang === 'en';
 
-const homeUrl = isEn ? '/en' : '/';
-const carUrl = isEn ? '/en/car' : '/mobil';
-const hubUrl = isEn ? '/en/lokasi' : '/lokasi';
+const homeUrl = isEn ? '/en/' : '/';
+const carUrl = isEn ? '/en/car/' : '/mobil/';
+const hubUrl = isEn ? '/en/lokasi/' : '/lokasi/';
 const waText = isEn
   ? 'Hi Lincah Rent Car, I would like to check available rental cars.'
   : 'Halo Admin Lincah Rent Car, saya ingin tanya ketersediaan sewa mobil.';

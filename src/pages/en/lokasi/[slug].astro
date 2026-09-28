@@ -5,6 +5,7 @@ import { buildWhatsAppUrl } from '../../../utils/whatsapp';
 import { renderMarkdownToString } from '../../../utils/renderMarkdown';
 import AutoLinkContent from '../../../components/AutoLinkContent.astro';
 import VehicleCard from '../../../components/VehicleCard.astro';
+import BottomSheetModal from '../../../components/BottomSheetModal.astro';
 import { MapPin, Clock, ShieldCheck, CheckCircle2, MessageCircle, ArrowLeft, ArrowRight, Flame } from '@lucide/astro';
 
 export async function getStaticPaths() {
@@ -34,6 +35,11 @@ const waUrl = buildWhatsAppUrl({
 
 const allCars = await getCollection('mobil');
 const popularCars = allCars.filter((car) => car.data.featured);
+const sheetCars = popularCars.map((c) => ({
+  id: c.id,
+  slug: c.id.replace(/\.md$/, ''),
+  data: c.data,
+}));
 ---
 
 <AppLayout
@@ -42,7 +48,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
   lang="en"
 >
   <div class="mb-4">
-    <a href="/en/lokasi" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+    <a href="/en/lokasi/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
       <ArrowLeft class="w-4 h-4" />
       <span>Back to All Pickup Hubs</span>
     </a>
@@ -103,7 +109,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
             </span>
             <h2 class="text-lg font-black text-slate-900">Recommended Units</h2>
           </div>
-          <a href="/en/car" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <a href="/en/car/" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>View All Cars</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -158,4 +164,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
       </div>
     </div>
   </div>
+
+  <!-- Bottom Sheet Modal untuk Quick Peek Specs -->
+  <BottomSheetModal cars={sheetCars} lang="en" />
 </AppLayout>

@@ -14,24 +14,24 @@ const idSwitchUrl = (lang === 'en' && alternateUrl) ? alternateUrl : getAlternat
 const enSwitchUrl = (lang === 'id' && alternateUrl) ? alternateUrl : getAlternateUrl(currentPath, 'en');
 
 const navLinks = lang === 'en' ? [
-  { href: '/en', label: 'Home' },
-  { href: '/en/car', label: 'Cars' },
-  { href: '/en/layanan', label: 'Services' },
-  { href: '/en/lokasi', label: 'Pickup Hubs' },
-  { href: '/en/guide', label: 'Travel Guide' },
+  { href: '/en/', label: 'Home' },
+  { href: '/en/car/', label: 'Cars' },
+  { href: '/en/layanan/', label: 'Services' },
+  { href: '/en/lokasi/', label: 'Pickup Hubs' },
+  { href: '/en/guide/', label: 'Travel Guide' },
 ] : [
   { href: '/', label: 'Beranda' },
-  { href: '/mobil', label: 'Mobil' },
-  { href: '/layanan', label: 'Layanan' },
-  { href: '/lokasi', label: 'Titik Jemput' },
-  { href: '/blog', label: 'Blog' },
+  { href: '/mobil/', label: 'Mobil' },
+  { href: '/layanan/', label: 'Layanan' },
+  { href: '/lokasi/', label: 'Titik Jemput' },
+  { href: '/blog/', label: 'Blog' },
 ];
 ---
 
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
     <!-- Brand / Logo -->
-    <a href={lang === 'en' ? '/en' : '/'} class="flex items-center gap-2.5 group shrink-0">
+    <a href={lang === 'en' ? '/en/' : '//'} class="flex items-center gap-2.5 group shrink-0">
       <img
         src="/favicon.svg"
         alt="Lincah Rent Car Logo"
@@ -50,7 +50,7 @@ const navLinks = lang === 'en' ? [
     <!-- Desktop Navigation Menu (Desktop Only) -->
     <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
       {navLinks.map((link) => {
-        const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en' && currentPath.startsWith(link.href));
+        const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en/' && currentPath.startsWith(link.href));
         return (
           <a
             href={link.href}
@@ -142,6 +142,8 @@ const navLinks = lang === 'en' ? [
         id="mobile-menu-trigger"
         class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
         aria-label="Buka Menu Navigasi"
+        aria-haspopup="dialog"
+        aria-controls="mobile-menu-drawer"
         aria-expanded="false"
       >
         <Menu class="w-6 h-6" />
@@ -157,13 +159,18 @@ const navLinks = lang === 'en' ? [
   aria-hidden="true"
 ></div>
 
-<!-- Mobile Navigation Drawer Panel -->
+<!-- Mobile Navigation Drawer Panel
+     Closed state uses `invisible` + `inert` so it is removed from both the
+     accessibility tree and the tab order (aria-hidden would be invalid here
+     because the drawer contains focusable links and buttons). -->
 <div
   id="mobile-menu-drawer"
-  class="md:hidden fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-50 shadow-2xl p-5 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+  class="md:hidden invisible fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-50 shadow-2xl p-5 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
   role="dialog"
   aria-modal="true"
   aria-label="Menu Navigasi Mobile"
+  tabindex="-1"
+  inert
 >
   <div class="space-y-6">
     <!-- Top Drawer Bar -->
@@ -247,7 +254,7 @@ const navLinks = lang === 'en' ? [
       </span>
       <div class="space-y-1">
         {navLinks.map((link) => {
-          const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en' && currentPath.startsWith(link.href));
+          const isActive = currentPath === link.href || (link.href !== '/' && link.href !== '/en/' && currentPath.startsWith(link.href));
           return (
             <a
               href={link.href}
@@ -465,27 +472,40 @@ const navLinks = lang === 'en' ? [
     });
 
     // 5. Mobile Drawer Handlers
+    let drawerCloseTimer = null;
+    function isDrawerOpen() {
+      return !!drawer && !drawer.classList.contains('translate-x-full');
+    }
     function openDrawer() {
       if (!drawer || !backdrop) return;
+      if (drawerCloseTimer) { clearTimeout(drawerCloseTimer); drawerCloseTimer = null; }
+      drawer.classList.remove('invisible');
+      drawer.removeAttribute('inert');
       backdrop.classList.remove('opacity-0', 'pointer-events-none');
       backdrop.classList.add('opacity-100');
       drawer.classList.remove('translate-x-full');
       drawer.classList.add('translate-x-0');
       if (mobileTrigger) mobileTrigger.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
+      if (typeof drawer.focus === 'function') drawer.focus();
     }
 
     function closeDrawer() {
-      if (!drawer || !backdrop) return;
+      if (!drawer || !backdrop || !isDrawerOpen()) return;
       drawer.classList.remove('translate-x-0');
       drawer.classList.add('translate-x-full');
       backdrop.classList.remove('opacity-100');
       backdrop.classList.add('opacity-0');
-      setTimeout(() => {
+      if (mobileTrigger) {
+        mobileTrigger.setAttribute('aria-expanded', 'false');
+        if (typeof mobileTrigger.focus === 'function') mobileTrigger.focus();
+      }
+      drawerCloseTimer = setTimeout(() => {
         backdrop.classList.add('pointer-events-none');
+        drawer.classList.add('invisible');
+        drawer.setAttribute('inert', '');
         document.body.style.overflow = '';
       }, 300);
-      if (mobileTrigger) mobileTrigger.setAttribute('aria-expanded', 'false');
     }
 
     if (mobileTrigger) {
@@ -506,10 +526,26 @@ const navLinks = lang === 'en' ? [
       backdrop.addEventListener('click', closeDrawer);
     }
 
-    // Close on escape key
+    // Close on escape key + trap focus inside the drawer
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && drawer && !drawer.classList.contains('translate-x-full')) {
+      if (!isDrawerOpen()) return;
+      if (e.key === 'Escape') {
         closeDrawer();
+        return;
+      }
+      if (e.key !== 'Tab' || !drawer) return;
+      const focusables = drawer.querySelectorAll(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === drawer)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     });
 

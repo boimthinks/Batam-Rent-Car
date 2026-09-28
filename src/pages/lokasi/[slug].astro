@@ -3,6 +3,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { buildWhatsAppUrl } from '../../utils/whatsapp';
 import VehicleCard from '../../components/VehicleCard.astro';
+import BottomSheetModal from '../../components/BottomSheetModal.astro';
 import { MapPin, Clock, ShieldCheck, CheckCircle2, MessageCircle, ArrowLeft, ArrowRight, Flame } from '@lucide/astro';
 
 export async function getStaticPaths() {
@@ -24,6 +25,11 @@ const waUrl = buildWhatsAppUrl({
 
 const allCars = await getCollection('mobil');
 const popularCars = allCars.filter((car) => car.data.featured);
+const sheetCars = popularCars.map((c) => ({
+  id: c.id,
+  slug: c.id.replace(/\.md$/, ''),
+  data: c.data,
+}));
 ---
 
 <AppLayout
@@ -31,7 +37,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
   description={`Sewa mobil antar langsung di ${d.areaName} ${d.city || 'Batam'}. Estimasi penyerahan ${d.pickupTimeEstimate}. Bebas biaya antar ke lobi kedatangan pelabuhan & bandara.`}
 >
   <div class="mb-4">
-    <a href="/lokasi" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
+    <a href="/lokasi/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600">
       <ArrowLeft class="w-4 h-4" />
       <span>Kembali ke Semua Titik Jemput</span>
     </a>
@@ -92,7 +98,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
             </span>
             <h2 class="text-lg font-black text-slate-900">Unit Rekomendasi</h2>
           </div>
-          <a href="/mobil" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <a href="/mobil/" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             <span>Lihat Semua Mobil</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
@@ -147,4 +153,7 @@ const popularCars = allCars.filter((car) => car.data.featured);
       </div>
     </div>
   </div>
+
+  <!-- Bottom Sheet Modal untuk Quick Peek Specs -->
+  <BottomSheetModal cars={sheetCars} lang="id" />
 </AppLayout>

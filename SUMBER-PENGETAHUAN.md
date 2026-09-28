@@ -173,6 +173,16 @@ Penulis **tidak perlu** mengetik tautan markdown manual untuk armada, layanan, a
 | 2 | Innova Reborn Car Rental with Driver to Batamindo Industrial Park Batu Aji: Reliable Corporate Travel in Batam | EN | `/en/guide/innova-reborn-car-rental-with-driver-batamindo-batu-aji` | Innova Reborn + With Driver + Batamindo Batu Aji | 2026-09-25 |
 | 3 | Rental Mobil Avanza Lepas Kunci Jemput di Bandara SMB II Palembang | ID | `/blog/rental-mobil-avanza-lepas-kunci-jemput-bandara-smb-2-palembang` | Avanza + Lepas Kunci + Bandara SMB II Palembang | 2026-09-25 |
 | 4 | Toyota Avanza Self-Drive Car Rental at SMB II Airport Palembang | EN | `/en/guide/toyota-avanza-self-drive-car-rental-smb-2-airport-palembang` | Avanza + Self-Drive + SMB II Airport Palembang | 2026-09-25 |
+| 5 | Sewa Alphard New Gen 4 di Batam: Layanan Chauffeur untuk Tamu VVIP dari Pelabuhan Batam Centre | ID | `/blog/sewa-alphard-new-gen-4-batam-chauffeur-tamu-vvip-batam-centre` | Alphard New Gen 4 + Chauffeur + Pelabuhan Batam Centre | 2026-09-26 |
+| 6 | Toyota Alphard Gen 4 Rental in Batam: Chauffeur Pickup for VIP Guests at Batam Centre Ferry Terminal | EN | `/en/guide/alphard-gen-4-chauffeur-service-batam-centre-ferry-pickup` | Alphard Gen 4 + Chauffeur + Batam Centre Ferry Terminal | 2026-09-26 |
+
+### Catatan Editorial Artikel No. 5 dan 6
+- Tarif yang dipakai: Alphard New Gen 4 Rp 2.800.000 per hari dengan supir (wajib supir, tanpa opsi lepas kunci), sesuai tabel Bagian 3. Angka tarif transfer dan full day versi premium dari outline awal sudah dibuang karena tidak ada dalam data.
+- Klaim teknis yang tidak terverifikasi dan tidak boleh dipakai ulang: TNGA-K, acoustic glass, A25A-FXS, pengurangan body roll 30 persen, mode relaksasi captain seat.
+- Janji yang tidak ada di data dan tidak boleh dijanjikan: unit cadangan Lexus LM atau Vellfire, waiting time bebas penalti 60 menit, AC kabin pada suhu 21 derajat.
+- Nama unit wajib mengikuti entitas kamus autolinks: "Toyota Alphard New Gen 4" (bukan "All New Alphard Gen 4") agar auto-link ke `/mobil/alphard-new-gen-4` aktif.
+- `featuredImage` artikel ini sementara memakai `/images/cars/alphard-gen-4.webp`. Ganti dengan aset blog khusus bernama `alphard-gen-4-vip-batam-centre.webp` saat gambar tersedia.
+
 
 ---
 

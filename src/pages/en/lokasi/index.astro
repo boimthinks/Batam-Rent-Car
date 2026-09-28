@@ -40,7 +40,7 @@ const locations = await getCollection('lokasi');
         >
           <div>
             <!-- 4:3 Location Image -->
-            <a href={`/en/lokasi/${slug}`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
+            <a href={`/en/lokasi/${slug}/`} class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden block">
               <img
                 src={d.image}
                 alt={d.title}
@@ -58,7 +58,7 @@ const locations = await getCollection('lokasi');
 
             <div class="p-5">
               <h2 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-                <a href={`/en/lokasi/${slug}`}>{d.areaName}</a>
+                <a href={`/en/lokasi/${slug}/`}>{d.areaName}</a>
               </h2>
 
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
@@ -80,7 +80,7 @@ const locations = await getCollection('lokasi');
 
           <div class="p-5 pt-0">
             <a
-              href={`/en/lokasi/${slug}`}
+              href={`/en/lokasi/${slug}/`}
               class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700"
             >
               <span>View Handover Details</span>

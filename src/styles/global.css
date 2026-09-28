@@ -63,6 +63,8 @@ body {
   font-size: 0.9375rem;
   line-height: 1.75;
   word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Headings */
@@ -274,9 +276,34 @@ body {
   font-size: inherit;
 }
 
-/* Tables - Responsive with horizontal scrollbar */
+/* Tables - Responsive with horizontal scrollbar (CSS-first, works with or without JS wrapper) */
+.blog-content table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .blog-content table {
+    white-space: normal;
+  }
+}
+
+/* When JS wraps the table, move the border/scroll container to wrapper */
 .blog-content .table-wrapper {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   margin: 1.5rem 0;
   border-radius: 1rem;
@@ -286,18 +313,35 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-.blog-content table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.875rem;
-  white-space: nowrap;
+.blog-content .table-wrapper table {
+  display: table;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
 }
 
-@media (min-width: 640px) {
-  .blog-content table {
-    white-space: normal;
-  }
+/* Subtle scrollbar for table container */
+.blog-content table::-webkit-scrollbar,
+.blog-content .table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.blog-content table::-webkit-scrollbar-track,
+.blog-content .table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+
+.blog-content table::-webkit-scrollbar-thumb,
+.blog-content .table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.blog-content table::-webkit-scrollbar-thumb:hover,
+.blog-content .table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .blog-content thead {

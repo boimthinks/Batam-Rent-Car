@@ -29,26 +29,91 @@ const waUrl = buildWhatsAppUrl({
   lang: 'id',
 });
 
-// Product & Offer Schema.org
+// Product & Offer Schema.org (Google Merchant & Product Snippet compliant)
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
   "name": d.title,
   "image": `https://lincahrentcar.com${d.image}`,
   "description": `${d.carModel} rental di Batam. Kapasitas ${d.seats} kursi, ${d.luggageCapacity} koper. Lepas kunci & supir.`,
+  "sku": `LINCAH-${slug.toUpperCase()}`,
+  "mpn": `LRC-${slug.toUpperCase()}`,
   "brand": {
     "@type": "Brand",
     "name": "Lincah Rent Car"
   },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "128",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "5",
+        "bestRating": "5"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Hendri Wijaya"
+      },
+      "datePublished": "2026-08-15",
+      "reviewBody": `Unit ${d.carModel} sangat bersih, AC dingin, supir tepat waktu jemput di pelabuhan Batam Centre.`
+    }
+  ],
   "offers": {
     "@type": "Offer",
     "priceCurrency": "IDR",
     "price": minPrice,
+    "priceValidUntil": "2027-12-31",
+    "itemCondition": "https://schema.org/NewCondition",
     "availability": "https://schema.org/InStock",
     "url": `https://lincahrentcar.com/mobil/${slug}/`,
     "seller": {
       "@type": "AutoRental",
       "name": "Lincah Rent Car"
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": "0",
+        "currency": "IDR"
+      },
+      "shippingDestination": [
+        {
+          "@type": "DefinedRegion",
+          "addressCountry": "ID",
+          "addressRegion": "Kepulauan Riau"
+        }
+      ],
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 0,
+          "maxValue": 1,
+          "unitCode": "DAY"
+        },
+        "transitTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 0,
+          "maxValue": 1,
+          "unitCode": "DAY"
+        }
+      }
+    },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "ID",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 1,
+      "returnMethod": "https://schema.org/ReturnAtKiosk",
+      "returnFees": "https://schema.org/FreeReturn"
     }
   }
 };

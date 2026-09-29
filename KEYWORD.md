@@ -1,8 +1,8 @@
 KEYWORD
 ---
-batam car rental with driver from ferry terminal
-private driver batam centre ferry terminal
-batam grocery shopping day trip car rental
+[done] batam car rental with driver from ferry terminal
+[done] private driver batam centre ferry terminal
+[done] batam grocery shopping day trip car rental
 singapore to batam grocery shopping private transport
 car rental batam centre pickup
 batam shopping trip day tour driver

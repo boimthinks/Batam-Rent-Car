@@ -175,6 +175,8 @@ Penulis **tidak perlu** mengetik tautan markdown manual untuk armada, layanan, a
 | 4 | Toyota Avanza Self-Drive Car Rental at SMB II Airport Palembang | EN | `/en/guide/toyota-avanza-self-drive-car-rental-smb-2-airport-palembang` | Avanza + Self-Drive + SMB II Airport Palembang | 2026-09-25 |
 | 5 | Sewa Alphard New Gen 4 di Batam: Layanan Chauffeur untuk Tamu VVIP dari Pelabuhan Batam Centre | ID | `/blog/sewa-alphard-new-gen-4-batam-chauffeur-tamu-vvip-batam-centre` | Alphard New Gen 4 + Chauffeur + Pelabuhan Batam Centre | 2026-09-26 |
 | 6 | Toyota Alphard Gen 4 Rental in Batam: Chauffeur Pickup for VIP Guests at Batam Centre Ferry Terminal | EN | `/en/guide/alphard-gen-4-chauffeur-service-batam-centre-ferry-pickup` | Alphard Gen 4 + Chauffeur + Batam Centre Ferry Terminal | 2026-09-26 |
+| 7 | Sewa Mobil Day Trip Belanja Sembako Batam: Panduan Rute, Kargo, dan Bea Cukai | ID | `/blog/sewa-mobil-day-trip-belanja-sembako-batam` | Innova Reborn / Avanza + Dengan Supir + Pelabuhan Ferry Batam | 2026-09-29 |
+| 8 | Batam Grocery Shopping Day Trip Car Rental: Route, Cargo, and Customs Guide | EN | `/en/guide/batam-grocery-shopping-day-trip-car-rental` | Innova Reborn / Avanza + With Driver + Batam Ferry Terminals | 2026-09-29 |
 
 ### Catatan Editorial Artikel No. 5 dan 6
 - Tarif yang dipakai: Alphard New Gen 4 Rp 2.800.000 per hari dengan supir (wajib supir, tanpa opsi lepas kunci), sesuai tabel Bagian 3. Angka tarif transfer dan full day versi premium dari outline awal sudah dibuang karena tidak ada dalam data.

@@ -11,7 +11,8 @@ import { Sparkles, ShieldCheck, Clock, CheckCircle2, ArrowRight, Car, MessageCir
 const allCars = await getCollection('mobil');
 const allLocations = await getCollection('lokasi');
 const allServices = await getCollection('layanan');
-const blogPosts = await getCollection('blog', ({ data }) => data.lang === 'id');
+const blogPostsRaw = await getCollection('blog', ({ data }) => data.lang === 'id');
+const blogPosts = blogPostsRaw.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
 // Sort cars so featured ones are first
 const sortedCars = [...allCars].sort((a, b) => {
